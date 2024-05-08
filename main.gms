@@ -510,13 +510,20 @@ parameter
 ;
   cm_co2_tax_growth = 1.05;            !! def = 1.05  !! regexp = is.numeric
 *'  (any number >= 0): rate of exponential increase over time
+
 parameter
-  c_macscen                 "scenario switch on whether or not to use MAC (Marginal Abatement Cost) for certain sectors not related to direct combustion of fossil fuel, e.g. fugitive emissions from old mines, forestry, agriculture and cement"
+  cm_co2_tax_growth         "growth rate of carbon tax"
 ;
-  c_macscen         = 1;               !! def = 1  !! regexp = 1|2
-*' * (1): on
-*' * (2): off
-*'
+  cm_co2_tax_growth = 1.05;            !! def = 1.05  !! regexp = is.numeric
+*'  (any number >= 0): rate of exponential increase over time
+
+parameter
+  cm_extractionTax          "share of carbon price as supplementary tax for fossil fuel extraction"
+;
+  cm_extractionTax         = 0;               !! def = 0  !! regexp = is.numeric
+*'  (any number >= 0): share of carbon price as supplementary tax for fossil fuel extraction
+*' example: 0.5 will add a tax equal to half the carbon price (multiplied by carbon intensity of the fossil fuel)
+
 parameter
   cm_nucscen                "nuclear option choice"
 ;

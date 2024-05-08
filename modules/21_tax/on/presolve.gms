@@ -5,6 +5,7 @@
 *** |  REMIND License Exception, version 1.0 (see LICENSE file).
 *** |  Contact: remind@pik-potsdam.de
 *** SOF ./modules/21_tax/on/presolve.gms
+
 *JS*
 *** calculation of tax rate, as a function of per-capita gdp levels
 p21_tau_so2_tax(ttot,regi)$(ttot.val ge 2005)=s21_so2_tax_2010*pm_gdp(ttot,regi)/pm_pop(ttot,regi);  !! scaled by GDP/cap in the unit [trn US$/bn people]
@@ -34,7 +35,8 @@ p21_taxrevFE0(ttot,regi) = sum((entyFe,sector)$entyFe2Sector(entyFe,sector),
     )
   )
 ;
-p21_taxrevResEx0(ttot,regi) = sum(pe2rlf(peEx(enty),rlf), p21_tau_fuEx_sub(ttot,regi,enty) * vm_fuExtr.l(ttot,regi,enty,rlf));
+
+p21_taxrevResEx0(ttot,regi) = sum(pe2rlf(peEx(enty),rlf), (p21_tau_fuEx_sub(ttot,regi,enty) + cm_extractionTax * pm_taxCO2eq(t,regi) * pm_cintraw(enty)) * vm_fuExtr.l(ttot,regi,enty,rlf));
 p21_taxrevPE0(ttot,regi,entyPe) = pm_tau_pe_tax(ttot,regi,entyPe) * vm_prodPe.l(ttot,regi,entyPe);
 p21_taxrevCES0(ttot,regi,in) = pm_tau_ces_tax(ttot,regi,in) * vm_cesIO.l(ttot,regi,in);
 p21_taxrevPE2SE0(ttot,regi) = sum(pe2se(enty,enty2,te),
