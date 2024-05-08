@@ -510,13 +510,6 @@ parameter
 ;
   cm_co2_tax_growth = 1.05;            !! def = 1.05  !! regexp = is.numeric
 *'  (any number >= 0): rate of exponential increase over time
-
-parameter
-  cm_co2_tax_growth         "growth rate of carbon tax"
-;
-  cm_co2_tax_growth = 1.05;            !! def = 1.05  !! regexp = is.numeric
-*'  (any number >= 0): rate of exponential increase over time
-
 parameter
   cm_extractionTax          "share of carbon price as supplementary tax for fossil fuel extraction"
 ;
@@ -529,6 +522,7 @@ parameter
   c_macscen         = 1;               !! def = 1  !! regexp = 1|2
 *' * (1): on
 *' * (2): off
+*'
 parameter
   cm_nucscen                "nuclear option choice"
 ;
