@@ -179,15 +179,9 @@ q21_taxrevResEx(t,regi)$(t.val ge max(2010,cm_startyear))..
   =e=
   sum(pe2rlf(peEx(enty),rlf),
     vm_fuExtr(t,regi,enty,rlf)
-    * (
-      !! subsidy for fuel extraction depending on region and year
-      p21_tau_fuEx_sub(t,regi,enty)
-      !! global tax on fossil fuel extraction, proportional to carbon price and emission intensity
-      + 0 * 1 * 0.5
-    )
+    * p21_tau_fuEx_sub(t,regi,enty)
   )
   - p21_taxrevResEx0(t,regi);
-
 
 
 ***---------------------------------------------------------------------------
