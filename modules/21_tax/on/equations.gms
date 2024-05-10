@@ -177,8 +177,21 @@ v21_taxrevCES(t,regi,in) =e= pm_tau_ces_tax(t,regi,in) * vm_cesIO(t,regi,in)
 *'  Documentation of overall tax approach is above at q21_taxrev.
 ***---------------------------------------------------------------------------
 q21_taxrevResEx(t,regi)$(t.val ge max(2010,cm_startyear))..
-v21_taxrevResEx(t,regi) =e=  sum(pe2rlf(peEx(enty),rlf), p21_tau_fuEx_sub(t,regi,enty) * vm_fuExtr(t,regi,enty,rlf))
-                             - p21_taxrevResEx0(t,regi);
+  v21_taxrevResEx(t,regi)
+  =e=
+  sum(pe2rlf(peEx(enty),rlf),
+    vm_fuExtr(t,regi,enty,rlf)
+    * (
+      !! subsidy for fuel extraction depending on region and year
+      p21_tau_fuEx_sub(t,regi,enty)
+      !! global tax on fossil fuel extraction, proportional to carbon price and emission intensity
+      + cm_extractionTax * pm_taxCO2eq(t,regi) * pm_cintraw(enty)
+    )
+  )
+  - p21_taxrevResEx0(t,regi);
+  
+*** v21_taxrevResEx(t,regi) =e=  sum(pe2rlf(peEx(enty),rlf), p21_tau_fuEx_sub(t,regi,enty) * vm_fuExtr(t,regi,enty,rlf))
+***                             - p21_taxrevResEx0(t,regi);
 
 ***---------------------------------------------------------------------------
 *'  Calculation of pe2se taxes (Primary to secondary energy technology taxes, specified by technology): effective tax rate (tax - subsidy) times SE output of technology 
