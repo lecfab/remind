@@ -1194,7 +1194,6 @@ parameter
   cm_wastelag = 0;   !! def = 0 no waste lag  !! regexp = 1|0
 *'
 *'
-*'
 ***-----------------------------------------------------------------------------
 *' ####                     FLAGS
 ***-----------------------------------------------------------------------------
@@ -1894,6 +1893,12 @@ $setGlobal c_nonco2_macc_scenario  Default     !! def = Default
 *' *  (off): no, only infeasable regions are repeated, standard setting
 *' *  (on):  also non-optimal regions are solved again, up to cm_solver_try_max
 $setglobal cm_repeatNonOpt off      !! def = off  !! regexp = off|on
+*' cm_coalPhaseoutOECD     "Activate a switch that force coal power technologies to phase-out production by 2030 for OECD countries"
+*'
+*' *  (off): no activation
+*' *  (on): if cm_coalPhaseoutOECD is activated, all unabated coal power technologies: namely coalchp, pc, igcc get assigned 0% capacity factor for USA,EUR,NEU,CAZ,JPN beyond 2030
+$setglobal cm_coalPhaseoutOECD  off   !! def = off   !! regexp = off|on
+*'
 
 *' @stop
 
