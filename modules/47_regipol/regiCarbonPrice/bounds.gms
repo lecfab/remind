@@ -159,6 +159,16 @@ $ifThen.ensec "%cm_Ger_Pol%" == "ensec"
     vm_capFac.lo("2030",regi,"ngcc")$sameas(regi,"DEU") = 0.2;
 $endIf.ensec
 
+*' Policy to ensure OECD phase out coal before 2030
+$ifThen.coalPhaseoutOECD "%cm_coalPhaseoutOECD%" == "on"
+loop(regi$(sameas(regi,"USA") or sameas(regi,"CAZ") or sameas(regi,"EUR") or sameas(regi,"NEU") or sameas(regi,"JPN")),
+    vm_capFac.fx(t,regi,"pc")$(t.val ge 2030) = 1e-7;
+    vm_capFac.fx(t,regi,"coalchp")$(t.val ge 2030) = 1e-7;
+    vm_capFac.fx(t,regi,"igcc")$(t.val ge 2030) = 1e-7;
+);
+$endIf.coalPhaseoutOECD
+
+
 *' Policy in energy security scenario for Germany activated by cm_EnSecScen_limit: 
 *' Limit PE gas demand from 2025 on to cm_EnSecScen_limit (in EJ/yr) gas imports + domestic gas in Germany.
 if (cm_EnSecScen_limit gt 0,
