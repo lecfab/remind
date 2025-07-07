@@ -121,6 +121,9 @@ q_balPe(t,regi,entyPe(enty))..
          + p_datacs(regi,enty) / 0.95
 ;
 
+q_XportRestriction(t,regi,tradePe(enty)) $ (t.val >= 2050)..
+*** in the long run, export cannot be more than 1000x the local consumption to avoid trade issues
+  vm_Xport(t,regi,enty) =l= 100 * vm_prodPe(t,regi,enty);
 
 ***---------------------------------------------------------------------------
 *' The secondary energy balance comprises the following terms (except power, defined on module):
