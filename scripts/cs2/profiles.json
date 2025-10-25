@@ -9,6 +9,12 @@
 		"projectLibrary": "'remind2'",
 		"outputFormat": "'html'"
 	},
+	"fossilPhaseout": {
+		"projectLibrary": "'remind2'",
+		"reg": "c('CAZ', 'CHA', 'EUR', 'IND', 'JPN', 'LAM', 'MEA', 'NEU', 'OAS', 'REF', 'SSA', 'USA', 'World')",
+		"yearsHist": "c(seq(2005, 2024, 1), seq(2025, 2050, 5))",
+		"yearsBarPlot": "c(2025, 2040, 2060, 2100)"
+	},
 	"H12": {
 		"projectLibrary": "'remind2'",
 		"reg": "c('CAZ', 'CHA', 'EUR', 'IND', 'JPN', 'LAM', 'MEA', 'NEU', 'OAS', 'REF', 'SSA', 'USA', 'World')",
