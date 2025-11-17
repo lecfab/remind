@@ -366,6 +366,9 @@ v_changeProdStartyearSlack(ttot,all_regi,all_te)     "slack variable to allow a 
 ***                                   POSITIVE VARIABLES
 ***----------------------------------------------------------------------------------------
 positive variables
+vm_fossilUse(ttot,regi) "fossil fuel use [TWa]"
+vm_fossilUseCum(regi)   "cumulated fossil fuel over 2010-2060 [TWa]"
+
 ***----------------------------------------------------------------------------------------
 ***-------------------------------------------------MACRO module---------------------------
 vm_esCapInv(ttot,all_regi,all_teEs)                   "investment for energy end-use capital at the energy service level"
@@ -443,6 +446,10 @@ $endif.minMaxSeFeSectorShareDev
 ***                                   EQUATIONS
 ***----------------------------------------------------------------------------------------
 equations
+q_fossilUse(ttot,regi)      "equation to calculate fossil fuel use"
+q_fossilUseCum(regi)        "equation to calculate cumulative fossil fuel use over 2010-2060"
+q_fossilBudget(regi)        "equation to set fossil fuel budget over the whole time horizon"
+q_fossilPhaseout(ttot,regi) "equation to limit fossil fuel use to phase-out levels by certain years"
 ***----------------------------------------------------------------------------------------
 ***------------------------------------------------MACRO module----------------------------
 q_limitSeel2fehes(ttot,all_regi)                     "equation to limit the share of electricity that can be used for fehes"

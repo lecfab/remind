@@ -12,6 +12,31 @@
 ***---------------------------------------------------------------------------
 ***---------------------------------------------------------------------------
 
+*** FL: compute how much fossil is used per year and cumulatively
+*** limit total fossil use to stay within carbon budget
+*** phase out fossil use from 2060 onwards
+
+q_fossilUse(ttot,regi)..
+  vm_fossilUse(ttot,regi)
+  =e=
+  sum(pe2se(peFos,entySe,te), vm_demPe(ttot,regi,peFos,entySe,te));
+
+q_fossilUseCum(regi)..
+  vm_fossilUseCum(regi)
+  =e=
+    sum(ttot $ (ttot.val <= 2060 and ttot.val >= 2010), vm_fossilUse(ttot,regi) * pm_ts(ttot)    )
+  + sum(ttot $ (ttot.val eq 2060 or  ttot.val eq 2010), vm_fossilUse(ttot,regi) * pm_ts(ttot) / 2);
+
+q_fossilBudget(regi)..
+  vm_fossilUseCum(regi)
+  =l=
+  vm_fossilUse("2025",regi) * 27; !! 15 years from 2010 to 2025, and 12 allowed cumulatively after
+
+q_fossilPhaseout(ttot,regi)$(ttot.val >= 2060)..
+  vm_fossilUse(ttot,regi)
+  =l= vm_fossilUse("2025",regi) / 1000;
+
+
 ***---------------------------------------------------------------------------
 *' Fuel costs are associated with the use of exhaustible primary energy (fossils, uranium) and biomass.
 ***---------------------------------------------------------------------------
