@@ -478,8 +478,6 @@ q_balSe(ttot,all_regi,all_enty)                      "balance of secondary energ
 q_balFe(ttot,all_regi,all_enty,all_enty,all_te)     "balance of final energy (fe)"
 q_balFeAfterTax(ttot,all_regi,all_enty,all_enty,emi_sectors,all_emiMkt) "balance of final energy after considering FE sectoral taxes (fe)"
 
-q_XportRestriction(ttot,all_regi,all_enty) "restriction on the amount of energy that a region can export"
-
 q_transPe2se(ttot,all_regi,all_enty,all_enty,all_te) "energy tranformation pe to se"
 q_transSe2fe(ttot,all_regi,all_enty,all_enty,all_te) "energy tranformation se to fe"
 q_transSe2se(ttot,all_regi,all_enty,all_enty,all_te) "energy transformation se to se"
