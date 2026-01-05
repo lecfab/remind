@@ -190,10 +190,14 @@ prepare <- function() {
   ### ADD MODULE INFO IN SETS  ############# END #########
 
   # copy right gdx file to the output folder
-  gdx_name <- paste0("config/gdx-files/",cfg$gms$cm_CES_configuration,".gdx")
-  if (0 != system(paste('cp', gdx_name,
-			file.path(cfg$results_folder, 'input.gdx')))) {
-    stop('Could not copy gdx file ', gdx_name)
+  gdx_name <- paste0("config/gdx-files/", cfg$gms$cm_CES_configuration, ".gdx")
+  if (!file.copy(gdx_name, file.path(cfg$results_folder, 'input.gdx'))) {
+    errmsg <- 'Could not copy gdx file:\n   '
+    if (cfg$gms$CES_parameters == 'calibrate') {
+      errmsg <- paste0(errmsg,
+        'Calibration requires a start point, so copy the gdx file with the closest configuration and paste it to:\n   ')
+    }
+    stop(errmsg, gdx_name, '\n\n')
   } else {
     message('Copied ', gdx_name, ' to input.gdx')
   }
