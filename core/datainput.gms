@@ -1627,7 +1627,7 @@ $endif.scaleDemand
 
 *** FL: Scale FE and UE demand for chemicals
 $ifthen.scaleDemandChem not "%cm_scaleDemandChem%" == "off"
-  loop((tall,tall2,all_regi) $ pm_scaleDemand(tall,tall2,all_regi),
+  loop((tall,tall2,all_regi) $ pm_scaleDemandChem(tall,tall2,all_regi),
     pm_fedemand(t,all_regi,all_in) $ secInd37_2_pf("chemicals",all_in) = pm_fedemand(t,all_regi,all_in) * (
 *** rescaled demand                                                    = normal demand *
 *** [ scaling factor                          + (1-scaling factor)                          * remaining phase-in, between zero and one ]
