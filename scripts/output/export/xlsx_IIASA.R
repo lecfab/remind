@@ -34,7 +34,11 @@ checkSummation <- TRUE                         # if TRUE, tries to use the one f
 lucode2::readArgs("project")
 
 projects <- list(
-  ELEVATE    = list(mapping = c("NAVIGATE", "ELEVATE"),
+ IKEA = list(
+	model = "REMIND 3.5", mapping = "ScenarioMIP", iiasatemplate = "https://files.ece.iiasa.ac.at/common-definitions/common-definitions-template.xlsx", checkSummation = "ScenarioMIP"
+), 
+
+ ELEVATE    = list(mapping = c("NAVIGATE", "ELEVATE"),
                     iiasatemplate = "https://files.ece.iiasa.ac.at/elevate/elevate-template.xlsx",
                     removeFromScen = "C_|eoc"),
   ELEVATE_coupled = list(mapping = c("NAVIGATE", "NAVIGATE_coupled", "ELEVATE"),
