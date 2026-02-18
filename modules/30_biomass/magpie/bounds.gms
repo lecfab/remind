@@ -4,30 +4,83 @@
 *** |  AGPL-3.0, you are granted additional permissions described in the
 *** |  REMIND License Exception, version 1.0 (see LICENSE file).
 *** |  Contact: remind@pik-potsdam.de
-*** SOF ./modules/30_biomass/magpie_40/bounds.gms
+*** SOF ./modules/30_biomass/magpie/bounds.gms
 
 *' @code{extrapage: "00_model_assumptions"}
 *** -------------------------------------------------------------
 *'  #### Bounds on 1st generation biomass annual production
 *** -------------------------------------------------------------
-*' Prescribe upper and lower limit for first generation biomass from 2030 on,
-*' so REMIND has some freedom before. After 2030 the production of 1st
-*' generation biofuels should be fixed (within a 90-100% range to avoid
-*' infeasibilities), since production values are exogenously harmonized with
-*' MAgPIE.
-*' Note: these bounds need to be updated since they are, in some regions, too
-*' strict to be compatible with historically installed capacities, such that
-*' the bounds in its current form can only be satisfied in combination with
-*' early retirement.
-vm_fuExtr.up(t,regi,"pebios","5")$(t.val ge 2030)  = p30_datapebio(regi,"pebios","5","maxprod",t);
-vm_fuExtr.up(t,regi,"pebioil","5")$(t.val ge 2030) = p30_datapebio(regi,"pebioil","5","maxprod",t);
+*' 1st generation biofuel quantities (from sugar/starch and oil crops) are not
+*' endogenously modeled but follow exogenous trajectories from IEA and FAO data
+*' and some future projections for the near term (until 2030). To align data
+*' with MAgPIE we mostly rely on FAO data for historic feedstock quantities, so
+*' `vm_fuExtr` is fixed to values from `p30_datapebio`, coming from FAO.
+*' Additionally there is the constraint to match historical capacities for the
+*' respective conversion technologies in 2005 from the IEA. Thus, the bound on
+*' vm_fuExtr is only applied from 2010 on (in 2005 feedstock quantities are
+*' fully determined via `p05_cap0`). However, in some cases the capacities that
+*' were build in 2005 or before require a feedstock supply that is higher
+*' than what the FAO-based bound on `vm_fuExtr` would allow for, i.e., FAO and
+*' IEA data do not match. In that case we relax the upper bound for all time
+*' steps such that the 2005 capacity constraint implcitly derived from IEA can
+*' still be matched. Eventually the lower bound is set to (almost) the upper
+*' bound to enforce matching the historical feedstock quantities. Please note
+*' that the link between capacity additions `vm_deltaCap` and the feedstock
+*' quantities basically follows what happens in the equations `qm_fuel2pe`,
+*' `q_balPe`, `q_transPe2se`, `q_limitCapSe` and `q_cap`. It is a bit
+*' simplified here, assuming that there is a one to one mapping between PE
+*' (pebios, pebioil) and the respective conversion technologies (bioeths,
+*' biodiesel, respectively), which is currently the case. If this changes in
+*' the future (which is unlikely), this part needs to be adapted.
 
-if(cm_1stgen_phaseout=0,
-    vm_fuExtr.lo(t,regi,"pebios","5")$(t.val ge 2030)  = 0.9 * p30_datapebio(regi,"pebios","5","maxprod",t);
-    vm_fuExtr.lo(t,regi,"pebioil","5")$(t.val ge 2030) = 0.9 * p30_datapebio(regi,"pebioil","5","maxprod",t);
-else                                                     
-    vm_fuExtr.lo(t,regi,"pebios","5")$(t.val eq 2030)  = 0.9 * p30_datapebio(regi,"pebios","5","maxprod",t);
-    vm_fuExtr.lo(t,regi,"pebioil","5")$(t.val eq 2030) = 0.9 * p30_datapebio(regi,"pebioil","5","maxprod",t);
+*** Set exogenous trajectory for sugar/starch crop feedstocks, using a corridor
+*** for lower and upper bounds of 0.99 to 1.01 for numerical flexibility
+vm_fuExtr.up(t, regi, "pebios", "5")$(t.val ge 2010 AND t.val ge cm_startyear) = 1.01 * max(
+  !! Use original bounds based on (mainly) FAO inpout data.
+  p30_datapebio(regi,"pebios","5","maxprod",t),
+
+  !! If historic capacities from IEA input require a larger feedstock supply,
+  !! relax the bound in 2010 and in all following time steps. We assume that
+  !! the bound should never fall below the feedstock supply in 2005. For that
+  !! we convert the sum of all (depreciated) historic capacity additions
+  !! `vm_deltaCap` in 2005 to feedstock supply quantities.
+    1 / pm_eta_conv(t,regi,"bioeths") * pm_cf(t,regi,"bioeths") * pm_dataren(regi,"nur","1","bioeths")
+  * sum(ttot$(ttot.val eq 2005),
+      sum(opTimeYr2te("bioeths",opTimeYr) $ (tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val ge 1)),
+          pm_ts(ttot - (pm_tsu2opTimeYr(ttot,opTimeYr) - 1))
+        * pm_omeg(regi,opTimeYr+1,"bioeths")
+        * vm_deltaCap.up(ttot - (pm_tsu2opTimeYr(ttot,opTimeYr) - 1),regi,"bioeths","1")
+      )
+    )
+  );
+vm_fuExtr.lo(t, regi, "pebios", "5")$(t.val ge 2010 AND t.val ge cm_startyear) =  0.98 * vm_fuExtr.up(t, regi, "pebios", "5");
+
+*** Set exogenous trajectory for oil crop feedstocks, using a corridor for
+*** lower and upper bounds of 0.99 to 1.01 for numerical flexibility
+vm_fuExtr.up(t, regi, "pebioil", "5")$(t.val ge 2010 AND t.val ge cm_startyear) = 1.01 * max(
+  !! Use original bounds based on (mainly) FAO inpout data.
+  p30_datapebio(regi,"pebioil","5","maxprod",t),
+
+  !! If historic capacities from IEA input require a larger feedstock supply,
+  !! relax the bound in 2010 and in all following time steps. We assume that
+  !! the bound should never fall below the feedstock supply in 2005. For that
+  !! we convert the sum of all (depreciated) historic capacity additions
+  !! `vm_deltaCap` in 2005 to feedstock supply quantities.
+    1 / pm_eta_conv(t,regi,"biodiesel") * pm_cf(t,regi,"biodiesel") * pm_dataren(regi,"nur","1","biodiesel")
+  * sum(ttot$(ttot.val eq 2005),
+      sum(opTimeYr2te("biodiesel",opTimeYr) $ (tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val ge 1)),
+          pm_ts(ttot - (pm_tsu2opTimeYr(ttot,opTimeYr) - 1))
+        * pm_omeg(regi,opTimeYr+1,"biodiesel")
+        * vm_deltaCap.up(ttot - (pm_tsu2opTimeYr(ttot,opTimeYr) - 1),regi,"biodiesel","1")
+      )
+    )
+  );
+vm_fuExtr.lo(t, regi, "pebioil", "5")$(t.val ge 2010 AND t.val ge cm_startyear) =  0.98 * vm_fuExtr.up(t, regi, "pebioil", "5");
+
+*** Relax lower bound after 2030 in case of a 1st gen phaseout scenario.
+if(cm_1stgen_phaseout=1,
+  vm_fuExtr.lo(t,regi,"pebios","5")$(t.val gt 2030)  = 0;
+  vm_fuExtr.lo(t,regi,"pebioil","5")$(t.val gt 2030) = 0;
 );
 
 
@@ -127,7 +180,7 @@ if (cm_phaseoutBiolc eq 1,
 $IFTHEN.bioprod_regi_lim not "%cm_bioprod_regi_lim%" == "off"
 loop( ext_regi$(p30_bioprod_regi_lim(ext_regi)),
   loop(regi$regi_groupExt(ext_regi,regi),
-    v30_BioPEProdTotal.up(t,regi)$(t.val ge 2035)= p30_bioprod_regi_lim(ext_regi)*sm_EJ_2_TWa
+    v30_BioPEProdTotal.up(t,regi)$(t.val ge max(2010, cm_startyear))= p30_bioprod_regi_lim(ext_regi)*sm_EJ_2_TWa
 *** distribute across regions in a region group by share in 2005 biomass production as the model is initialized in 2005 with fixed historic production
                                                     * v30_BioPEProdTotal.l("2005",regi) 
                                                     / sum(regi2$regi_groupExt(ext_regi,regi2), 
@@ -136,4 +189,4 @@ loop( ext_regi$(p30_bioprod_regi_lim(ext_regi)),
 );
 $ENDIF.bioprod_regi_lim
 
-*** EOF ./modules/30_biomass/magpie_40/bounds.gms
+*** EOF ./modules/30_biomass/magpie/bounds.gms

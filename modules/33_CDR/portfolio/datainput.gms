@@ -91,6 +91,13 @@ else
   p33_BiocharPrice(ttot) = cm_33_BCpriceForm / sm_tBC_2_TWa / sm_trillion_2_non * sm_D2015_2_D2017;
 );
 
+parameter p33_BiocharLimitCropland(all_regi)    "Limits on Biochar deployment on land based on cropland in 2020. Assumption: max 50 t BC / ha / 10 yrs =   5 t BC / ha / yr. Unit:  [Mt BC/ yr]"
+/
+$ondelim
+$include "./modules/33_CDR/portfolio/input/p33_BiocharLimitCropland.cs4r"
+$offdelim
+/;
+
 *------------------------------------------------------------------------------------
 *' #### ocean alkalinity enhancement input data (Kowalczyk et al., 2024)
 *------------------------------------------------------------------------------------

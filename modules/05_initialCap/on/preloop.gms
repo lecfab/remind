@@ -411,6 +411,23 @@ pm_eta_conv(ttot,regi,teChp) = pm_data(regi,"eta",teChp);
 pm_eta_conv(ttot,regi,"elh2") = pm_dataeta(ttot,regi,"elh2");
 
 
+*** Replace 1st gen biomass conversion efficiencies with global values for all
+*** regions. The regionalized calibration to historical input and output values
+*** created via mrremind::calcIO does not work for these technologies, because
+*** the data that is currently being used does not give information on
+*** feedstock inputs, such that technically input and output are equal, which
+*** leads to a conversion efficiency of 1 in all regions that historically
+*** already deploy 1st gen biomass. While this is actually true for `bioeths`,
+*** because we assume that the conversion to ethanol has already happened, i.e.
+*** this technology simply passes PE to SE without any further conversion, this
+*** is not correct for `biodiesel`. Here we assume that the oil feedstock is
+*** already transformed to plant oil, but the conversion to biodiesel still has
+*** to happen. To avoid confusion, we use global values for both technologies
+*** (i.e., also for `bioeths` where it does not make a difference, but using
+*** the global value of 1 makes it explicitly clear that no conversion is
+*** happening).
+pm_eta_conv(ttot,regi,"bioeths")   = fm_dataglob("eta","bioeths");
+pm_eta_conv(ttot,regi,"biodiesel") = fm_dataglob("eta","biodiesel");
 
 
 *** Increase SE2FE efficiency for gases in DEU following AGEB data from 2020

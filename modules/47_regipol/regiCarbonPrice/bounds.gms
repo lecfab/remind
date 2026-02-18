@@ -21,15 +21,33 @@
 *' ####### Power Sector
 
 $ifThen.tech_bounds_2025 "%cm_tech_bounds_2025%" == "on"
+*' Set bounds for renewable power capacity in 2025 based on recent and historic growth rates
 *' This limits wind and solar PV capacity additions for 2025 in light of recent slow developments as of 2023.
 *' Upper bound is double the historic maximum capacity addition in 2011-2020.
 *' In addition: Limit solar PV capacity to 120 GW in 2025 (2023-2027 average) given that we are at only 76 GW PV in 2023
 loop(regi$(sameAs(regi,"DEU")),
   vm_deltaCap.up("2025",regi,"windon","1")=2*smax(tall$(tall.val ge 2011 and tall.val le 2020), pm_delta_histCap(tall,regi,"windon"));
   vm_deltaCap.up("2025",regi,"spv","1")=2*smax(tall$(tall.val ge 2011 and tall.val le 2020), pm_delta_histCap(tall,regi,"spv"));
-  vm_cap.up("2025",regi,"spv","1")=0.12;
+
+*' 2025 lower bounds for VRE capacities based on installed capacity by 2024 and recent yearly growth rates
+  vm_cap.lo("2025",regi,"spv","1")=0.096+0.014;
+  vm_cap.lo("2025",regi,"windon","1")=0.062+0.003;
+  vm_cap.lo("2025",regi,"windoff","1")=0.009+0.001;
 );
 $endIf.tech_bounds_2025
+
+*' make assumptions on minimum renewable power and heat pump growth for Germany between 2025 and 2030 and distinguish two different scenarios ("Current Policies" and "Optimistic")
+$ifthen.cm_VREminCap_Ger "%cm_VREminCap_Ger%" == "CurrPol"
+    vm_deltaCap.lo("2030",regi,"windon","1")$(sameAs(regi,"DEU")) = 6/1000;
+    vm_deltaCap.lo("2030",regi,"windoff","1")$(sameAs(regi,"DEU")) = 2/1000;
+    vm_cap.lo("2030",regi,"geohe","1")$(sameAs(regi,"DEU")) = 7/1000;
+$endIf.cm_VREminCap_Ger
+
+$ifthen.cm_VREminCap_Ger "%cm_VREminCap_Ger%" == "Opt"
+    vm_deltaCap.lo("2030",regi,"windon","1")$(sameAs(regi,"DEU")) = 7.5/1000;
+    vm_deltaCap.lo("2030",regi,"windoff","1")$(sameAs(regi,"DEU")) = 3/1000;
+    vm_cap.lo("2030",regi,"geohe","1")$(sameAs(regi,"DEU")) = 7/1000;
+$endIf.cm_VREminCap_Ger
 
 
 *' These bounds account for historic gas power development.

@@ -78,6 +78,7 @@ pm_co2eq0(tall,all_regi)                             "Total greenhouse gas emiss
 
 *** parameters used for MAC curves
 pm_macBaseMagpie(tall,all_regi,all_enty)             "baseline emissions from MAgPIE (type emiMacMagpie) [GtC, Mt CH4, Mt N]"
+f_macBaseMagpie_coupling(tall,all_regi,all_enty)     "baseline emissions from MAgPIE (type emiMacMagpie) read from magpie.gdx in coupling [GtC, Mt CH4, Mt N]"
 p_macBaseMagpieNegCo2(tall,all_regi)                 "net negative CO2 emissions from land-use change [GtC]"
 p_macBaseExo(tall,all_regi,all_enty)                 "exogenous baseline emissions (type emiMacExo) [Mt CH4, Mt N]"
 p_co2lucSub(tall,all_regi,all_enty)                  "subtypes of CO2 land use change emissions, add up to total land use change emissions, coming from MAgPIE, passed through REMIND for reporting, not used anywhere, remain unchanged [GtC]"
@@ -571,6 +572,8 @@ parameters
 pm_budgetCO2eq(all_regi)                             "budget for regional energy-emissions in period 1 [GtC]"
 pm_actualbudgetco2(ttot)                             "actual level of cumulated emissions starting from 2020 [GtCO2]"
 p_actualbudgetco2_iter(iteration,ttot)               "track actual level of cumulated emissions starting from 2020 over iterations [GtCO2]"
+pm_actualbudgetco2Regi(ttot,all_regi)                "Regional- actual level of cumulated emissions starting from 2020 [GtCO2]"
+p_actualbudgetco2Regi_iter(iteration,ttot,all_regi)  "Regional- track actual level of cumulated emissions starting from 2020 over iterations [GtCO2]"
 
 *** iteration parameters
 pm_SolNonInfes(all_regi)                             "model status from last iteration. 1 means status 2 or 7, 0 for all other status codes"
@@ -593,6 +596,14 @@ o_negitr_cumulative_CO2_emieng_seq(iteration)        "estimated sequestered CO2 
 o_negitr_disc_cons_dr5_reg(iteration,all_regi)       "estimated discounted consumption 2005-2100 with discount rate 5%. 'estimated' because of different times step lengths around 2100 [T$]"
 o_negitr_disc_cons_drInt_reg(iteration,all_regi)     "estimated discounted consumption 2005-2100 with internal discount rate. 'estimated' because of different times step lengths around 2100 [T$]"
 o_negitr_total_forc(iteration)                       "total forcing in 2100"
+o_pm_pebiolc_demandmag(iteration,ttot,all_regi)      "track pm_pebiolc_demandmag across Nash iterations"
+o_pm_macBaseMagpie(iteration,ttot,all_regi,all_enty) "track pm_macBaseMagpie across Nash iterations"
+o_pm_macSwitch(iteration,ttot,all_regi,all_enty)     "track pm_macSwitch across Nash iterations"
+o_p_efFossilFuelExtr_n2obio(iteration,all_regi)      "track p_efFossilFuelExtr for n2obio across Nash iterations"
+o_vm_fuExtr_pebiolc(iteration,ttot,all_regi)         "track vm_fuExtr for pebiolc across Nash iterations"
+o_vm_pebiolc_price(iteration,ttot,all_regi)          "track vm_pebiolc_price across Nash iterations"
+o_PEDem_Bio_ECrops(iteration,ttot,all_regi)          "track pebiolc demand across Nash iterations"
+o_vm_emiMacSector_co2luc(iteration,ttot,all_regi)    "track co2luc across Nash iterations"
 ;
 
 *** ------------- Scalars ----------------------------
@@ -670,8 +681,12 @@ sm_globalBudget_absDev       "absolute deviation of global cumulated CO2 emissio
 sm_eps                       "small number: 1e-9 "  /1e-9/
 
 sm_CES_calibration_iteration "current calibration iteration number, loaded from environment variable cm_CES_calibration_iteration"  /0/
+sm_magpieIter                "Count the number of MAgPIE iterations, starting with zero" /0/
+sm_magpieIterEnd             "Number of MAgPIE iterations that have to be performed. Equals the number of elements defined in the set magpieIter"
+sm_updateMagpieData          "Boolean defined in core/presolve indicating if MAgPIE is running in the current Nash iteration (1) or not (0)" /0/
 ;
 
+sm_magpieIterEnd = card(magpieIter);
 * GA sm_dmac changes depending on the choice of MACs in c_nonco2_macc_version
 $ifthen %c_nonco2_macc_version% == "PBL_2007"
 * PBL_2007 MACs are discretized in steps of 5 $2005/tCeq

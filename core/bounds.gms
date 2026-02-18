@@ -272,7 +272,7 @@ if(c_bioh2scen = 0, !! no bioh2 technologies
 *' Switches to activate pyrolysis technologies
 loop(teBiopyr(te) $ (not sameas(te, "biopyrliq")), !! established industrial technologies
   vm_cap.fx(t,regi,te,rlf) $ (t.val <= 2015) = 0; 
-  if(c_biopyrEstablished = 0,
+  if(c_biopyrOptions eq 0,
     vm_deltaCap.fx(t,regi,te,rlf) $ (t.val >= cm_startyear) = 0; 
   else
     vm_cap.up("2020",regi,te,rlf) = p_boundCapBiochar("2020",regi) * sm_tBC_2_TWa / 3; 
@@ -286,11 +286,10 @@ loop(te $ sameas(te, "biopyrliq"), !! does not yet exist commercially
   vm_cap.fx(t,regi,"biopyrliq",rlf)  $ (t.val <= 2025) = 0;
   vm_deltaCap.lo(t,regi,"biopyrliq",rlf) $ (t.val > cm_startyear) = 1e-8; !! initiate a negligible increase to help model find the technology
   vm_deltaCap.up(t,regi,"biopyrliq",rlf) $ (t.val > cm_startyear) = inf; !! revert fixing to small values above
-  if(c_biopyrliq = 0,
-    vm_deltaCap.fx(t,regi,"biopyrliq",rlf) $ (t.val >= cm_startyear) = 0; 
+  if(c_biopyrOptions le 1,
+  vm_deltaCap.fx(t,regi,"biopyrliq",rlf) $ (t.val >= cm_startyear) = 0;
   );
 );
-
 
 *** ==================================================================
 *' #### 4. Assumptions on carbon management
@@ -482,8 +481,6 @@ display vm_emiFgas.L;
 loop(all_te $ (
     sameas(all_te, "solhe") or
     sameas(all_te, "fnrs") or
-    sameas(all_te, "pcc") or
-    sameas(all_te, "pco") or
 *** windoffshore-todo: to remove when removing wind from all_te
     sameas(all_te, "wind") or
     sameas(all_te, "storwind") or

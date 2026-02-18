@@ -18,8 +18,21 @@ pm_actualbudgetco2(ttot)$( 2020 lt ttot.val )
         )
     )
   * sm_c_2_co2;
+
+*** `pm_actualbudgetco2Regi(ttot, regi)` includes emissions from 2020 to `ttot` (inclusive).
+pm_actualbudgetco2Regi(ttot,regi)$( 2020 lt ttot.val )
+  = sum((ttot2)$( 2020 le ttot2.val AND ttot2.val le ttot.val ),
+      vm_emiAll.l(ttot2,regi,"co2")
+      * ( (0.5 + pm_ts(ttot2) / 2)$( ttot2.val eq 2020 ) !! second half of the 2020 period (mid 2020 - end 2022) plus 0.5 to account fo beginning 2020 - mid 2020  
+        + (pm_ts(ttot2))$( 2020 lt ttot2.val AND ttot2.val lt ttot.val ) !! entire middle periods
+        + ((pm_ttot_val(ttot) - pm_ttot_val(ttot-1)) / 2 + 0.5)$(ttot2.val eq ttot.val ) !! first half of the final period plus 0.5 to account fo mid - end of final year
+        )
+    )
+  * sm_c_2_co2;
+
 *** track `pm_actualbudgetco2(ttot)` over iterations
 p_actualbudgetco2_iter(iteration,ttot)$( 2020 lt ttot.val) = pm_actualbudgetco2(ttot);
+p_actualbudgetco2Regi_iter(iteration,ttot,regi)$( 2020 lt ttot.val) = pm_actualbudgetco2Regi(ttot,regi);
 
 *** track pm_taxCO2eq over iterations - pm_taxCO2eq is adjusted in 45_carbonprice/functionalForm/postsolve.gms and consequently pm_taxCO2eq_iter gets overwritten there
 pm_taxCO2eq_iter(iteration,t,regi) = pm_taxCO2eq(t,regi);
@@ -201,5 +214,11 @@ p_FEPrice_by_SE_iter(iteration,t,regi,entySe,entyFe) = p_FEPrice_by_SE(t,regi,en
 p_FEPrice_by_Sector_iter(iteration,t,regi,entyFe,sector) = p_FEPrice_by_Sector(t,regi,entyFe,sector);
 p_FEPrice_by_EmiMkt_iter(iteration,t,regi,entyFe,emiMkt) = p_FEPrice_by_EmiMkt(t,regi,entyFe,emiMkt);
 p_FEPrice_by_FE_iter(iteration,t,regi,entyFe) = p_FEPrice_by_FE(t,regi,entyFe);
+
+*** Track demand for purpose-grown ligno-cellulosic biomass across iterations
+o_vm_pebiolc_price(iteration,ttot,regi)  = vm_pebiolc_price.l(ttot,regi);
+o_vm_fuExtr_pebiolc(iteration,ttot,regi) = vm_fuExtr.l(ttot,regi,"pebiolc","1");
+o_PEDem_Bio_ECrops(iteration,ttot,regi) = vm_fuExtr.l(ttot,regi,"pebiolc","1") + (1 - pm_costsPEtradeMp(regi,"pebiolc")) * vm_Mport.l(ttot,regi,"pebiolc") - vm_Xport.l(ttot,regi,"pebiolc");
+o_vm_emiMacSector_co2luc(iteration,ttot,regi) = vm_emiMacSector.l(ttot,regi,"co2luc");
 
 *** EOF ./core/postsolve.gms

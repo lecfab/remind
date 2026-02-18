@@ -237,29 +237,6 @@ $IFTHEN.renewablesFloorCost not "%cm_renewables_floor_cost%" == "off"
 	pm_data(regi,"floorcost",te)$((regi_group("EUR_regi",regi)) AND (p_new_renewables_floor_cost(te))) = pm_data(regi,"floorcost",te)  + p_new_renewables_floor_cost(te);
 $ENDIF.renewablesFloorCost
 
-*** VRE capacity factor adjustments for Germany in line with results from detailed models in ARIADNE project
- loop(te$sameas(te,"windon"),
-  loop(regi$sameas(regi,"DEU"),
-    pm_cf("2025",regi,te) =  1.04 * pm_cf("2025",regi,te);
-    pm_cf("2030",regi,te) =  1.08 * pm_cf("2030",regi,te);
-    pm_cf("2035",regi,te) =  1.12 * pm_cf("2035",regi,te);
-    pm_cf("2040",regi,te) =  1.16 * pm_cf("2040",regi,te);
-    pm_cf("2045",regi,te) =  1.2  * pm_cf("2045",regi,te);
-    pm_cf(t,regi,te)$(t.val gt 2045) =  pm_cf("2045",regi,te);
-  );
-);
-
-loop(te$sameas(te,"spv"),
-  loop(regi$sameas(regi,"DEU"),
-    pm_cf("2025",regi,te) =  1.02 * pm_cf("2025",regi,te);
-    pm_cf("2030",regi,te) =  1.04 * pm_cf("2030",regi,te);
-    pm_cf("2035",regi,te) =  1.06 * pm_cf("2035",regi,te);
-    pm_cf("2040",regi,te) =  1.08 * pm_cf("2040",regi,te);
-    pm_cf("2045",regi,te) =  1.10 * pm_cf("2045",regi,te);
-    pm_cf(t,regi,te)$(t.val gt 2045) =  pm_cf("2045",regi,te);
-  );
-);
-
 
 *** p_EmiLULUCFCountryAcc contains historic LULUCF emissions from UNFCCC, 
 *** used for rescaling land-use change emissions for emissions targets based on national accounting
@@ -271,19 +248,8 @@ $offdelim
 /
 ;
 
-*** difference between 2020 land-use change emissions from Magpie and UNFCCC 2015 and 2020 moving average land-use change emissions
-p47_LULUCFEmi_GrassiShift(ttot,regi)$(p47_EmiLULUCFCountryAcc("2020",regi)) =
-  pm_macBaseMagpie("2020",regi,"co2luc")
-  -
-  (
-    (
-      ((p47_EmiLULUCFCountryAcc("2013",regi) + p47_EmiLULUCFCountryAcc("2014",regi) + p47_EmiLULUCFCountryAcc("2015",regi) + p47_EmiLULUCFCountryAcc("2016",regi) + p47_EmiLULUCFCountryAcc("2017",regi))/5)
-      +
-      ((p47_EmiLULUCFCountryAcc("2018",regi) + p47_EmiLULUCFCountryAcc("2019",regi) + p47_EmiLULUCFCountryAcc("2020",regi) + p47_EmiLULUCFCountryAcc("2021",regi))/4)
-    )/2
-    * 1e-3/sm_c_2_co2
-  )
-;
+
+*** Moved calculation of p47_LULUCFEmi_GrassiShift to 47_regipol/regiCarbonPrice/presolve.gms
 
 *** -------------------------Primary Energy Tax--------------------------
 

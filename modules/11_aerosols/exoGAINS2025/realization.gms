@@ -5,8 +5,15 @@
 *** |  REMIND License Exception, version 1.0 (see LICENSE file).
 *** |  Contact: remind@pik-potsdam.de
 *** SOF ./modules/11_aerosols/exoGAINS2025/realization.gms
-
-*' @description Bundle the air pollution emission results from different sources. We calculate the emissions for sectors that are available in the GAINS model with the interactively run script exoGAINS2025Airpollutants.R. Land related emissions are taken from MAGPIE. 
+ 
+*' @description  Calculation of air pollution emissions for those sectors
+*'               (currently indst, trans, res, and power) and species 
+*'               (currently BC, OC, and SO2) that are priced in REMIND.
+*'               It uses the emission factors from mrremind::calcGAINS2025.
+*'               Important note: These emissions are not reported, but only used to 
+*'               calculate air pollution costs. Instead, the air pollutant emissions 
+*'               for all species and all 35 GAINS sectors are calculated and reported
+*'               in remind2::reportAirPollutantEmissions.
 
 *' @limitations EDGE-transport runs in between iterations and is therefore not fully optimized.
 
@@ -17,6 +24,5 @@ $Ifi "%phase%" == "declarations" $include "./modules/11_aerosols/exoGAINS2025/de
 $Ifi "%phase%" == "datainput" $include "./modules/11_aerosols/exoGAINS2025/datainput.gms"
 $Ifi "%phase%" == "equations" $include "./modules/11_aerosols/exoGAINS2025/equations.gms"
 $Ifi "%phase%" == "presolve" $include "./modules/11_aerosols/exoGAINS2025/presolve.gms"
-$Ifi "%phase%" == "postsolve" $include "./modules/11_aerosols/exoGAINS2025/postsolve.gms"
 *######################## R SECTION END (PHASES) ###############################
 *** EOF ./modules/11_aerosols/exoGAINS2025/realization.gms

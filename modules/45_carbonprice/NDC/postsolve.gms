@@ -25,6 +25,10 @@ p45_CO2eqwoLU_actual(p45_NDCyearSet(t,regi)) =
 pm_taxCO2eq_iter(iteration,p45_NDCyearSet(t,regi)) = pm_taxCO2eq(t,regi);
 p45_CO2eqwoLU_actual_iter(iteration,p45_NDCyearSet(t,regi)) = p45_CO2eqwoLU_actual(t,regi);
 
+*** calculate relative deviation of actual emissions from target emissions
+** as measure how close we are to reaching NDC emissions target
+pm_NDCEmiTargetDeviation(p45_NDCyearSet(t,regi)) = (p45_CO2eqwoLU_goal(t,regi) - p45_CO2eqwoLU_actual(t,regi)) / p45_CO2eqwoLU_goal(t,regi);
+
 display vm_co2eq.l;
 display p45_CO2eqwoLU_actual;
 display p45_CO2eqwoLU_goal;

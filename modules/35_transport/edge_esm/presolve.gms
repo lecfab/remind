@@ -10,7 +10,12 @@ if( (ord(iteration) le 25 and ord(iteration) ge cm_startIter_EDGET and (mod(ord(
     or (ord(iteration) le 45  and ord(iteration) gt 25 and  (mod(ord(iteration), 3) eq 0))
     or (ord(iteration)  gt 45 and  (mod(ord(iteration), 5) eq 0)),
 
+*** Track runtime
+    putclose runtime gyear(jnow):0:0 "-" gmonth(jnow):0:0 "-" gday(jnow):0:0 " " ghour(jnow):0:0 ":" gminute(jnow):0:0 ":" gsecond(jnow):0:0 ",iterativeEdgeTransport," iteration.val:0;
+
     Execute "Rscript -e 'library(edgeTransport); edgeTransport::iterativeEdgeTransport()'";
+*** Track runtime
+    putclose runtime gyear(jnow):0:0 "-" gmonth(jnow):0:0 "-" gday(jnow):0:0 " " ghour(jnow):0:0 ":" gminute(jnow):0:0 ":" gsecond(jnow):0:0 ",GAMS," iteration.val:0;
 
     Execute_Loadpoint 'p35_esCapCost' p35_esCapCost;
     pm_esCapCost(t,regi,teEs_dyn35)$(t.val gt 2010 AND t.val le 2100) = p35_esCapCost(t,regi,"%cm_GDPpopScen%","%cm_demScen%","%cm_EDGEtr_scen%",teEs_dyn35);

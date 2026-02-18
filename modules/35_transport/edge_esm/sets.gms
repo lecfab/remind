@@ -135,6 +135,8 @@ NAV_all
 CAMP_lscWeak
 CAMP_lscStrong
 CAMP_lscLow
+Mix2ICEban_lowAvShip
+Mix4ICEban_lowAvShip
 /
 
 EDGE_scenario(EDGE_scenario_all) "Selected EDGE-T scenario"

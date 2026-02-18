@@ -179,6 +179,23 @@ pm_secBioShare(ttot,regi,entyFe,sector)$((seAgg2fe("all_seso",entyFe) OR seAgg2f
   sum((entySe,all_enty,all_te)$entyFeSec2entyFeDetail(entyFe,sector,all_enty), f04_IO_output(ttot,regi,entySe,all_enty,all_te) )
 ;
 
+
+*** adjustment of biomass shares in demand sectors specifically for Germany
+*** 1. adjustment of 2020 shares based on AGEB data
+*** 2. assumptions on non-increasing coal shares for after 2020 in industry and buildings
+loop(regi$(sameAs("DEU", regi)),
+*** set 2020 biomass share in LDV transport in Germany to 6% based on AGEB data
+*** https://ag-energiebilanzen.de/daten-und-fakten/auswertungstabellen/
+  pm_secBioShare("2020",regi,"fepet","trans") = 0.06;
+*** set 2020 biomass share in in non-LDV transport in Germany to 5% based on AGEB data
+*** biofuel share in HDV road transport liquids about 7%, translated to total non-LDV liqiuds about 5%
+  pm_secBioShare("2020",regi,"fedie","trans") = 0.05;
+*** set 2020 biomass share in industry solids to 20% based on AGEB data
+  pm_secBioShare("2020",regi,"fesos","indst") = 0.2;
+*** set maximum coal share in buildings after 2020 to 2020 value as residential coal heating is not going to recover once phased out
+  pm_secBioShare(t,regi,"fesos","build")$(t.val gt 2020) = pm_secBioShare("2020",regi,"fesos","build");
+);
+
 display pm_secBioShare;
 
 pm_IO_input(regi,all_enty,all_enty2,all_te)   = 0;

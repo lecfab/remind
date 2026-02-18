@@ -7,3 +7,5 @@
 name,type,reason
 pm_macCost,input,questionnaire
 pm_pebiolc_costs_emu_preloop,input,irrelevant
+sm_magpieIter,switch,not needed
+sm_updateMagpieData,switch,not needed

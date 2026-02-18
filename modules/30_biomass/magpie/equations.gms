@@ -4,7 +4,7 @@
 *** |  AGPL-3.0, you are granted additional permissions described in the
 *** |  REMIND License Exception, version 1.0 (see LICENSE file).
 *** |  Contact: remind@pik-potsdam.de
-*** SOF ./modules/30_biomass/magpie_40/equations.gms
+*** SOF ./modules/30_biomass/magpie/equations.gms
 ***---------------------------------------------------------------------------
 ***                      FUEL COSTS FOR BIOENERGY
 ***---------------------------------------------------------------------------
@@ -23,8 +23,9 @@ q30_costFuBio(ttot,regi)$(ttot.val ge cm_startyear)..
          vm_costFuBio(ttot,regi)
          =e= sum(peren2rlf30(enty,rlf), p30_datapebio(regi,enty,rlf,"cost",ttot) * vm_fuExtr(ttot,regi,enty,rlf))
          +
-$if %cm_MAgPIE_coupling% == "on"  (v30_pebiolc_costs(ttot,regi) * v30_multcost(ttot,regi))
-$if %cm_MAgPIE_coupling% == "off" (v30_pebiolc_costs(ttot,regi))
+         (v30_pebiolc_costs(ttot,regi) * v30_multcost(ttot,regi))$(sm_magpieIter gt 0)
+         +
+         (v30_pebiolc_costs(ttot,regi)                          )$(sm_magpieIter eq 0)
          + 
          sum(peren2cont30(enty,rlf), vm_fuExtr(ttot,regi,enty,rlf) * pm_costsTradePeFinancial(regi,"use",enty));
 
@@ -146,4 +147,4 @@ q30_limitBiotrmod(t,regi)$(t.val > 2020)..
 
 *' @stop
 
-*** EOF ./modules/30_biomass/magpie_40/equations.gms
+*** EOF ./modules/30_biomass/magpie/equations.gms

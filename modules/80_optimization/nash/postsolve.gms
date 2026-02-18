@@ -344,6 +344,19 @@ loop((ttot,ttot2,ext_regi,emiMktExt)$pm_emiMktTarget_dev(ttot,ttot2,ext_regi,emi
 );
 $endif.emiMkt
 
+$ifthen.NDC "%carbonprice%" == "NDC" 
+*** additional criterion: Were NDC emissions targets reached?
+loop((t,regi)$pm_NDCEmiTargetDeviation(t,regi),
+*** criterion actual emissions need to be either below target or only up to cm_NDC_target_DevTol higher than goal emissions
+  if( (pm_NDCEmiTargetDeviation(t,regi)  le -cm_NDC_target_DevTol)
+*** exclude SSA from target check because we do not implement this target but assume CO2 price ceiling
+      AND NOT sameas(regi,"SSA"),
+    s80_bool = 0;
+    p80_messageShow("NDC") = YES;
+  );
+);
+$endif.NDC
+
 *** additional criterion: Were the quantity targets reached by implicit taxes and/or subsidies? 
 $ifthen.cm_implicitQttyTarget not "%cm_implicitQttyTarget%" == "off"
 p80_implicitQttyTarget_dev_iter(iteration,ttot,ext_regi,qttyTarget,qttyTargetGroup) = pm_implicitQttyTarget_dev(ttot,ext_regi,qttyTarget,qttyTargetGroup);
@@ -387,7 +400,6 @@ if ( abs(p80_globalBudget_absDev_iter(iteration)) gt cm_budgetCO2_absDevTol , !!
   p80_messageShow("globalbudget") = YES;
 );
 
-
 $ifthen.carbonprice %carbonprice% == "functionalForm"
 *** check whether cm_peakBudgYr corresponds to year of maximum cumulative CO2 emissions
 if (  (     cm_iterative_target_adj eq 9
@@ -403,6 +415,28 @@ if (  (   cm_iterative_target_adj eq 9
   p80_messageShow("peakbudget") = YES;
 );
 $endIf.carbonprice
+
+$ifthen.carbonpriceRegi %carbonprice% == "functionalFormRegi"
+*** check regional budget target, must be within tolerance level of target value
+  p80_regionalBudget_absDev_iter(iteration,regi) = pm_budgetDeviation(regi);
+  loop(regi,
+  !! If the deviation is positive, i.e. budget is too high and requires an increase in Carbon Price => always throw an error
+  if(p80_regionalBudget_absDev_iter(iteration,regi) ge 0,
+    if (abs(p80_regionalBudget_absDev_iter(iteration,regi)) gt pm_regionalBudget_absDevTol(regi), !! If the deviation is 
+      s80_bool = 0;
+      p80_messageShow("regiBudget") = YES;
+    );
+  !! If the deviation is negative, i.e. budget is too low and would require a decrease of the Carbon Price => only "not converged" if the carbon price is not already very low, 
+  !! "Very low" is for now <1 USD/t CO2 in 2100, tbd
+  else
+    if ((abs(p80_regionalBudget_absDev_iter(iteration,regi)) gt abs(cm_budgetCO2_absDevTol)) 
+         AND (pm_taxCO2eq("2100",regi) gt (1 * sm_DptCO2_2_TDpGtC)), 
+      s80_bool = 0;
+      p80_messageShow("regiBudget") = YES;
+    );
+  );
+  );  
+$endIf.carbonpriceRegi
 
 
 *** additional criterion: if damage internalization is on, is damage iteration converged?
@@ -480,12 +514,20 @@ $ifthen.carbonprice %carbonprice% == "functionalForm"
           display sm_peakbudget_diff;
 	      );
 $endIf.carbonprice
+$ifthen.carbonpriceRegi %carbonprice% == "functionalFormRegi"
+        if(sameas(convMessage80, "regiBudget"),
+		      display "#### 7.) A regional budget target has not been reached yet.";
+          display "#### Convergence determined by pm_regionalBudget_absDevTol.";
+          display "#### Also check pm_taxCO2eq_iter (regional CO2 tax paths tracked over iterations [T$/GtC])";
+          display p80_regionalBudget_absDev_iter, pm_factorRescale_taxCO2Regi_Funneled2;
+        );
+$endIf.carbonpriceRegi
         if(sameas(convMessage80, "IterationNumber"),
           display "#### 0.) REMIND did not run sufficient iterations (currently set at 18, to allow for at least 4 iterations with EDGE-T)";
         );
 $ifthen.emiMkt not "%cm_emiMktTarget%" == "off"       
         if(sameas(convMessage80, "regiTarget"),
-		      display "#### 7) A regional climate target has not been reached yet.";
+		      display "#### 7.) A regional climate target has not been reached yet.";
           display "#### Check out the pm_emiMktTarget_dev parameter of 47_regipol module.";
           display "#### For budget targets, the parameter gives the percentage deviation of current emissions in relation to the target value.";
           display "#### For yearly targets, the parameter gives the current emissions minus the target value in relative terms to the 2005 emissions.";
@@ -495,6 +537,13 @@ $ifthen.emiMkt not "%cm_emiMktTarget%" == "off"
           display pm_taxemiMkt_iteration;
 	      );
 $endif.emiMkt  
+$ifthen.NDC "%carbonprice%" == "NDC"       
+        if(sameas(convMessage80, "NDC"),
+		      display "#### 8) Some regional NDC target has not been reached within the tolerance of cm_NDC_target_DevTol";
+          display "#### Check pm_NDCEmiTargetDeviation, which is the relative deviation of emissions from the target";
+          display pm_NDCEmiTargetDeviation;
+	      );
+$endif.NDC 
 $ifthen.cm_implicitQttyTarget not "%cm_implicitQttyTarget%" == "off"    
         if(sameas(convMessage80, "implicitEnergyTarget"),
 		      display "#### 10) A quantity target has not been reached yet.";
@@ -662,34 +711,39 @@ $endIf.cm_implicitPePriceTarget
 
 ***if all conditions are met, stop optimization.
 if(s80_bool eq 1,
+  if((sm_magpieIter < sm_magpieIterEnd) AND (cm_MAgPIE_Nash eq 1),
+    display "######################################################################################################";
+    display "Nash converged but MAgPIE hasn't run often enough yet. Continuing Nash.";
+    display "######################################################################################################";
+  else
 ***in automatic mode, set iteration_max such that no next iteration takes place 
-     if(cm_nash_autoconverge ne 0,
+    if(cm_nash_autoconverge ne 0,
       cm_iteration_max = iteration.val - 1;
-        );
-     OPTION decimals = 3;
-     s80_numberIterations = cm_iteration_max + 1;
-     display "######################################################################################################";
-     display "Run converged!!";
-     display "#### Nash Solution Report";
-     display "#### Convergence threshold reached within ",s80_numberIterations, "iterations.";
-     display "############";
-     display "Model solution parameters of last iteration";
-     display p80_repy;
-     display "#### Residual market surpluses in 2100 are:";
-     display  p80_surplusMax2100;
-     display "#### This meets the prescribed tolerance requirements of: ";
-     display  p80_surplusMaxTolerance;
-     display "#### Info: These residual market surplusses in monetary are :";
-     display  p80_defic_trade;
-     display "#### Info: And the sum of those (equivalent to Negishi's defic_sum):";
-     display  p80_defic_sum;
-     display "#### This value in percent of the NPV of consumption is: ";
-     display  p80_defic_sum_rel;
-     display "############";
-     display "######################################################################################################";
-     OPTION decimals = 3;
-     s80_converged = 1;         !! set machine-readable status parameter
-
+    );
+    OPTION decimals = 3;
+    s80_numberIterations = cm_iteration_max + 1;
+    display "######################################################################################################";
+    display "Run converged!!";
+    display "#### Nash Solution Report";
+    display "#### Convergence threshold reached within ",s80_numberIterations, "iterations.";
+    display "############";
+    display "Model solution parameters of last iteration";
+    display p80_repy;
+    display "#### Residual market surpluses in 2100 are:";
+    display  p80_surplusMax2100;
+    display "#### This meets the prescribed tolerance requirements of: ";
+    display  p80_surplusMaxTolerance;
+    display "#### Info: These residual market surplusses in monetary are :";
+    display  p80_defic_trade;
+    display "#### Info: And the sum of those (equivalent to Negishi's defic_sum):";
+    display  p80_defic_sum;
+    display "#### This value in percent of the NPV of consumption is: ";
+    display  p80_defic_sum_rel;
+    display "############";
+    display "######################################################################################################";
+    OPTION decimals = 3;
+    s80_converged = 1;         !! set machine-readable status parameter
+  );
 );
 
 *** check if any region has failed to solve consecutively for

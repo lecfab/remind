@@ -4,7 +4,7 @@
 *** |  AGPL-3.0, you are granted additional permissions described in the
 *** |  REMIND License Exception, version 1.0 (see LICENSE file).
 *** |  Contact: remind@pik-potsdam.de
-*** SOF ./modules/30_biomass/magpie_40/declarations.gms
+*** SOF ./modules/30_biomass/magpie/declarations.gms
 
 scalars
 s30_D2TD                "Multiplicative factor to convert from Dollar to TeraDollar"     /1.0e-12/
@@ -20,17 +20,15 @@ p30_max_pebiolc_path_glob(tall)                 "Time path of global maximal peb
 p30_maxprod_residue(ttot,all_regi)              "Maximal potential of residues enhanced by demand of biotr [TWa]"
 p30_pebiolc_pricemag(tall,all_regi)             "Prices for lignocellulosic purpose grown bioenergy from MAgPIE [T$US/TWa]"
 pm_pebiolc_demandmag(tall,all_regi)             "Production of lignocellulosic purpose grown bioenergy from MAgPIE [TWa]"
+p30_pebiolc_demand_helper(tall,all_regi)        "Save level of vm_fuelex for a better starting point since it is overwritten between nash iterations"
 p30_demPe(ttot,all_regi)                        "Primary energy demand imported from gdx or previous iteration [TWa]"
-
 
 $IFTHEN.bioprod_regi_lim not "%cm_bioprod_regi_lim%" == "off"
 p30_bioprod_regi_lim(ext_regi)   "limit of total biomass production per region or region group [EJ/yr]" / %cm_bioprod_regi_lim% /
 $ENDIF.bioprod_regi_lim
 
-
-
 *** Shift factor calculation
-pm_pebiolc_costs_emu_preloop(ttot,all_regi)     "Bioenergy costs calculated with emulator using MAgPIE demand. For shift factor calculation [T$US]"
+pm_pebiolc_costs_emu_preloop(ttot,all_regi)    "Bioenergy costs calculated with emulator using MAgPIE demand. For shift factor calculation [T$US]"
 p30_pebiolc_price_emu_preloop(ttot,all_regi)    "Bioenergy price calculated with emulator using MAgPIE demand. For shift factor calculation [T$US/TWa]"
 p30_pebiolc_price_emu_preloop_shifted(ttot,all_regi) "Bioenergy price calculated with emulator using MAgPIE demand after shift factor calculation [T$US/TWa]"
 p30_pebiolc_pricshift(ttot,all_regi)            "Regional translation factor that shifts emulator prices to better fit actual MAgPIE prices [-]"
@@ -46,10 +44,18 @@ i30_bioen_price_b(ttot,all_regi)   "Time dependent slope in bioenergy price form
 p30_pebiolc_price_dummy            "Dummy for the bio-energy price to match the bioenergy bound cm_maxProdBiolc"
 p30_max_pebiolc_dummy              "Dummy for bio energy supply at p30_pebiolc_price_dummy"
 p30_fuelex_dummy(all_regi)         "Dummy for bio-energy supply per region"
+
+*** Parameters used to track other parameters across Nash iterations
+o_p30_pebiolc_pricmult(iteration,ttot,all_regi)                  "track p30_pebiolc_pricmult across Nash iterations"
+o_p30_pebiolc_pricemag(iteration,ttot,all_regi)                  "track o_p30_pebiolc_pricemag across Nash iterations"
+o_p30_pebiolc_price_emu_preloop(iteration,ttot,all_regi)         "track p30_pebiolc_price_emu_preloop across Nash iterations"
+o_p30_pebiolc_price_emu_preloop_shifted(iteration,ttot,all_regi) "track p30_pebiolc_price_emu_preloop_shifted across Nash iterations"
+o_pm_pebiolc_costs_emu_preloop(iteration,ttot,all_regi)          "track p30_pebiolc_costs_emu_preloop across Nash iterations"
+o_v30_pebiolc_costs(iteration,ttot,all_regi)                     "track v30_pebiolc_costs across Nash iterations"
 ;
 
 variables
-vm_costFuBio(ttot,all_regi)        "fuel costs from bioenergy production (can be negative depending on total agricultural cost) [T$]"
+vm_costFuBio(ttot,all_regi)        "fuel costs from bioenergy production [T$US]"
 vm_pebiolc_price(ttot,all_regi)    "bioenergy price based on MAgPIE supply curves [T$/TWa]"
 v30_pebiolc_costs(ttot,all_regi)   "Bioenergy costs according to MAgPIE supply curves [T$US]"
 v30_shift_r2                       "Least square to minimize during shift calculation"
@@ -76,4 +82,4 @@ q30_limitTeBio(ttot,all_regi)      "Limit BECCS in policy runs relative to refer
 q30_BioPEProdTotal(ttot,all_regi)  "Calculate total domestic PE biomass production"
 q30_limitBiotrmod(ttot,all_regi)   "limit the total amount of modern biomass use for solids to the amount of coal use for solids"
 ;
-*** EOF ./modules/30_biomass/magpie_40/declarations.gms
+*** EOF ./modules/30_biomass/magpie/declarations.gms

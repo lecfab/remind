@@ -8,6 +8,10 @@
 prepare <- function() {
 
   timePrepareStart <- Sys.time()
+  # Record the time when the preparation starts in runtime.log
+  # The content of this file will be added to runstatistics.rda at the end.
+  cat("Saving timePrepareStart to runtime.log\n")
+  write(paste(Sys.time(), "prepare", 0, sep = ","), file = "runtime.log")
 
   # Load libraries
   #require(lucode, quietly = TRUE,warn.conflicts =FALSE)
@@ -103,17 +107,6 @@ prepare <- function() {
     cat("\nRun scripts/input/create_input_for_50_damage_exogenous.R to create input file with exogenous damage factor from another run.\n")
     source("scripts/input/create_input_for_50_damage_exogenous.R")
     create_input_for_50_damage_exogenous(as.character(cfg$files2export$start["input_damage.gdx"]))
-  }
-
-  # If a path to a MAgPIE report is supplied use it as REMIND input (used for REMIND-MAgPIE coupling)
-  # ATTENTION: modifying gms files
-  if (!is.null(cfg$pathToMagpieReport)) {
-    getReportData(
-      path_to_report = cfg$pathToMagpieReport,
-      inputpath_mag  = cfg$gms$biomass,
-      inputpath_acc  = cfg$gms$agCosts,
-      var_luc        = cfg$var_luc
-    )
   }
 
   # Update module paths in GAMS code

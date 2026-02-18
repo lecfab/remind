@@ -23,10 +23,6 @@ $ifthen.checkssp1  "%cm_APssp%" == "SSP4"
 abort "SSP4 not available for SMIPbySSP scenario. Please select another scenario x ssp combination."
 $endif.checkssp1
 $endif.checkscen1
-*** GAINSlegacy not available in exoGAINS2025
-$ifthen.checkssp2  "%cm_APssp%" == "GAINSlegacy"
-abort "GAINSlegacy not supported by exoGAINS2025. Please switch to exoGAINS for using GAINSlegacy.";
-$endif.checkssp2
 
 *** initialize p11_share_trans with the global value, will be updated after each negishi/nash iteration
 p11_share_trans("2005",regi) = 0.617;
@@ -50,85 +46,28 @@ p11_share_trans("2130",regi) = 0.865;
 p11_share_trans("2150",regi) = 0.872;
 
 *** GAINS2025 emission factors --------------------------------------------------------------------------
-parameter f11_emifacs_sectREMIND_sourceCEDS(tall,all_regi,all_enty,all_enty,all_te,all_sectorEmi,emisForEmiFac,all_APscen,all_APssp)     "GAINS2025 emission factors weighted by CEDS emissions"
+parameter f11_emifacs_sectREMIND_sourceCEDS(tall,all_regi,all_enty,all_enty,all_te,all_sectorEmi11,emisForEmiFac11,all_APscen,all_APssp)     "GAINS2025 emission factors weighted by CEDS emissions"
 /
 $ondelim
 $include "./modules/11_aerosols/exoGAINS2025/input/f11_emifacs_sectREMIND_sourceCEDS.cs4r"
 $offdelim
 /
 ;
-parameter f11_emifacs_sectREMIND_sourceGAINS(tall,all_regi,all_enty,all_enty,all_te,all_sectorEmi,emisForEmiFac,all_APscen,all_APssp)     "GAINS2025 emission factors weighted by GAINS emissions"
+parameter f11_emifacs_sectREMIND_sourceGAINS(tall,all_regi,all_enty,all_enty,all_te,all_sectorEmi11,emisForEmiFac11,all_APscen,all_APssp)     "GAINS2025 emission factors weighted by GAINS emissions"
 /
 $ondelim
 $include "./modules/11_aerosols/exoGAINS2025/input/f11_emifacs_sectREMIND_sourceGAINS.cs4r"
 $offdelim
 /
 ;
-p11_emiFacAP(ttot,regi,enty,enty2,te,sectorEndoEmi,emisForEmiFac)$(ttot.val ge 2005) = 0.0;
+p11_emiFacAP(ttot,regi,enty,enty2,te,sectorEndoEmi11,emisForEmiFac11)$(ttot.val ge 2005) = 0.0;
 if (cm_APsource eq 1,  !! CEDS
-  p11_emiFacAP(ttot,regi,enty,enty2,te,sectorEndoEmi,emisForEmiFac)$(ttot.val ge 2005) = f11_emifacs_sectREMIND_sourceCEDS(ttot,regi,enty,enty2,te,sectorEndoEmi,emisForEmiFac,"%cm_APscen%","%cm_APssp%");
+  p11_emiFacAP(ttot,regi,enty,enty2,te,sectorEndoEmi11,emisForEmiFac11)$(ttot.val ge 2005) = f11_emifacs_sectREMIND_sourceCEDS(ttot,regi,enty,enty2,te,sectorEndoEmi11,emisForEmiFac11,"%cm_APscen%","%cm_APssp%");
 elseIf cm_APsource  eq 2,  !! GAINS
-  p11_emiFacAP(ttot,regi,enty,enty2,te,sectorEndoEmi,emisForEmiFac)$(ttot.val ge 2005) = f11_emifacs_sectREMIND_sourceGAINS(ttot,regi,enty,enty2,te,sectorEndoEmi,emisForEmiFac,"%cm_APscen%","%cm_APssp%");
+  p11_emiFacAP(ttot,regi,enty,enty2,te,sectorEndoEmi11,emisForEmiFac11)$(ttot.val ge 2005) = f11_emifacs_sectREMIND_sourceGAINS(ttot,regi,enty,enty2,te,sectorEndoEmi11,emisForEmiFac11,"%cm_APscen%","%cm_APssp%");
 else 
   abort "cm_APsource must be either CEDS or GAINS"
 );
-
-*** load emission data from land use change 
-*** TODO this is outdated and not used anymore in coupled runs, should be replaced to correctly account for air pollutant emissions in MAgPIE
-parameter f11_emiAPexoAgricult(tall,all_regi,all_enty,all_exogEmi,all_rcp_scen)     "ECLIPSE emission factors of air pollutants"
-/
-$ondelim
-$include "./modules/11_aerosols/exoGAINS2025/input/f11_emiAPexoAgricult.cs4r"
-$offdelim
-/
-;
-p11_emiAPexoAgricult(t,regi,enty,all_exogEmi) = f11_emiAPexoAgricult(t,regi,enty,all_exogEmi,"%cm_rcp_scen%");
-
-
-if ( (cm_startyear gt 2005),
-Execute_Loadpoint 'input_ref' p11_emiAPexo =  p11_emiAPexo;
-);
-
-p11_emiAPexo(t,regi,enty,"Agriculture")      = p11_emiAPexoAgricult(t,regi,enty,"Agriculture");
-p11_emiAPexo(t,regi,enty,"AgWasteBurning")   = p11_emiAPexoAgricult(t,regi,enty,"AgWasteBurning");
-p11_emiAPexo(t,regi,enty,"ForestBurning")    = p11_emiAPexoAgricult(t,regi,enty,"ForestBurning");
-p11_emiAPexo(t,regi,enty,"GrasslandBurning") = p11_emiAPexoAgricult(t,regi,enty,"GrasslandBurning");
-
-display p11_emiAPexo;
-
-*** Initialize p11_emiAPexsolve to zero 
-*** TODO Could be improved by using values from previous run if available
-p11_emiAPexsolve(tall,all_regi,all_sectorEmi,emiRCP) = 0;
-
-*JS* exogenous air pollutant emissions from land use, land use change, and industry processes
-*** TODO These emissions are outdated, needs to be updated to include outputs from MAgPIE
-pm_emiExog(t,regi,"SO2") = p11_emiAPexo(t,regi,"SO2","AgWasteBurning")
-                         + p11_emiAPexo(t,regi,"SO2","Agriculture")
-                         + p11_emiAPexo(t,regi,"SO2","ForestBurning")
-                         + p11_emiAPexo(t,regi,"SO2","GrasslandBurning")
-                         + p11_emiAPexsolve(t,regi,"waste","SOx")
-                         + p11_emiAPexsolve(t,regi,"solvents","SOx")
-                         + p11_emiAPexsolve(t,regi,"extraction","SOx")
-                         + p11_emiAPexsolve(t,regi,"indprocess","SOx");
-pm_emiExog(t,regi,"BC") = p11_emiAPexo(t,regi,"BC","AgWasteBurning")
-                        + p11_emiAPexo(t,regi,"BC","Agriculture")
-                        + p11_emiAPexo(t,regi,"BC","ForestBurning")
-                        + p11_emiAPexo(t,regi,"BC","GrasslandBurning")
-                        + p11_emiAPexsolve(t,regi,"waste","BC")
-                        + p11_emiAPexsolve(t,regi,"solvents","BC")
-                        + p11_emiAPexsolve(t,regi,"extraction","BC")
-                        + p11_emiAPexsolve(t,regi,"indprocess","BC");
-pm_emiExog(t,regi,"OC") = p11_emiAPexo(t,regi,"OC","AgWasteBurning")
-                        + p11_emiAPexo(t,regi,"OC","Agriculture")
-                        + p11_emiAPexo(t,regi,"OC","ForestBurning")
-                        + p11_emiAPexo(t,regi,"OC","GrasslandBurning")
-                        + p11_emiAPexsolve(t,regi,"waste","OC")
-                        + p11_emiAPexsolve(t,regi,"solvents","OC")
-                        + p11_emiAPexsolve(t,regi,"extraction","OC")
-                        + p11_emiAPexsolve(t,regi,"indprocess","OC");
-
-display p11_emiFacAP;
-display pm_emiExog;
 
 parameter p11_share_ind_fehos(tall,all_regi)               "Share of heating oil used in the industry (rest is residential)"
 /
@@ -146,7 +85,7 @@ else
 );
 
 *** Initialise sector shares to 1
-p11_share_sector(ttot,sectorEndoEmi2te(enty,enty2,te,sectorEndoEmi),regi) = 1.0;
+p11_share_sector(ttot,sectorEndoEmi2te11(enty,enty2,te,sectorEndoEmi11),regi) = 1.0;
 
 *** Compute sector shares
 loop ((t,regi)$( t.val ge 2005 ),
@@ -275,8 +214,8 @@ p11_costpollution("tdfoshos",   "BC", "res")   = 110;
 p11_costpollution("tdfosdie",   "BC", "trans") = 40000;
 p11_costpollution("tdfospet",   "BC", "trans") = 40000;
 
-p11_EF_uncontr(enty,enty2,te,regi,"SO2",sectorEndoEmi)$(sectorEndoEmi2te(enty,enty2,te,sectorEndoEmi)) = pm_emifac("2005",regi,enty,enty2,te,"SO2") + 0.0001;
-p11_EF_uncontr(enty,enty2,te,regi,"BC",sectorEndoEmi)$(sectorEndoEmi2te(enty,enty2,te,sectorEndoEmi))  = pm_emifac("2005",regi,enty,enty2,te,"BC")  + 0.0001;
-p11_EF_uncontr(enty,enty2,te,regi,"OC",sectorEndoEmi)$(sectorEndoEmi2te(enty,enty2,te,sectorEndoEmi))  = pm_emifac("2005",regi,enty,enty2,te,"OC")  + 0.0001;
+p11_EF_uncontr(enty,enty2,te,regi,"SO2",sectorEndoEmi11)$(sectorEndoEmi2te11(enty,enty2,te,sectorEndoEmi11)) = pm_emifac("2005",regi,enty,enty2,te,"SO2") + 0.0001;
+p11_EF_uncontr(enty,enty2,te,regi,"BC",sectorEndoEmi11)$(sectorEndoEmi2te11(enty,enty2,te,sectorEndoEmi11))  = pm_emifac("2005",regi,enty,enty2,te,"BC")  + 0.0001;
+p11_EF_uncontr(enty,enty2,te,regi,"OC",sectorEndoEmi11)$(sectorEndoEmi2te11(enty,enty2,te,sectorEndoEmi11))  = pm_emifac("2005",regi,enty,enty2,te,"OC")  + 0.0001;
 
 *** EOF ./modules/11_aerosols/exoGAINS2025/datainput.gms

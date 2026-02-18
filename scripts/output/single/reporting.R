@@ -127,9 +127,8 @@ if (!is.null(magpie_reporting_file) && file.exists(magpie_reporting_file)) {
             paste(sharedvariables, collapse = ", "))
     tmp_mag <- dplyr::filter(tmp_mag, !.data$variable %in% sharedvariables)
   }
-  # harmonize scenario name from -mag-xx to -rem-xx
+  # Harmonize scenario names: use the REMIND scenario name also for MAgPIE
   tmp_mag$scenario <- paste0(scenario)
-  tmp_mag$value[! is.finite(tmp_mag$value)] <- NA # MAgPIE reports Inf https://github.com/pik-piam/magpie4/issues/70
   tmp_rem_mag <- rbind(tmp_rem, tmp_mag)
   quitte::write.mif(tmp_rem_mag, path = remind_reporting_file)
   piamutils::deletePlus(remind_reporting_file, writemif = TRUE)

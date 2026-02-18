@@ -20,7 +20,8 @@ c_description    "%c_description%"   /"for model description, see explanatory te
 c_results_folder "%c_results_folder%"  /"for cfg$results_folder, see explanatory text"/
 c_model_version  "model version" /%c_model_version%/
 cm_GDPpopScen    "cm_GDPpopScen as set for use in GDX"      /%cm_GDPpopScen%/
-
+cm_APssp         "cm_APssp as set for use in GDX"           /%cm_APssp%/
+cm_APscen        "cm_APscen as set for use in GDX"          /%cm_APscen%/
 
 all_GDPpopScen    "all possible GDP scenarios"
 /
@@ -302,17 +303,6 @@ all_te          "all energy technologies, including from modules"
     idreaf_ng    "Route: NG Direct reduction / EAF without CCS"
     idreaf_ng_ccs "Route: H2 Direct reduction / EAF with CCS"
     seceaf       "Route: Scrap-loaded EAF"
-    pcc          "outdated technology, only here to avoid compilation errors if input data containing information for this technology are used"
-    pco          "outdated technology, only here to avoid compilation errors if input data containing information for this technology are used"
-*** transport technologies for deleted realization complex of module 35_transport 
-*** only here to make it possible to process input data that still includes data for these obsolete transport technologies
-    apCarPeT        "outdated transport technology"
-    apCarDiT        "outdated transport technology"
-    apcarDiEffT     "outdated transport technology"
-    apcarDiEffH2T   "outdated transport technology"
-    apCarH2T        "outdated transport technology"
-    apCarElT        "outdated transport technology"
-    apTrnElT        "outdated transport technology"
 *** outdated entries, still used in module 04 until structuremappings are fixed
     tdbiohoi        "transmission and distribution for heating oil from biomass origin to industry"
     tdfoshoi        "transmission and distribution for heating oil from fossil origin to industry"
@@ -485,10 +475,7 @@ all_enty             "all types of quantities"
     fegai        "industry use of gaseous energy carriers"
     fehei        "industry use of district heat"
     feeli        "industry use of electricity"
-*** dummy entries to allow inclusion of some output variables into f04_IO_output.cs4r - can be removed once the structuremappings are fixed/improved
-    x_seliq
-    x_feho
-    x_fedie
+    
 /
 
 all_esty "energy services"
@@ -506,42 +493,6 @@ all_esty "energy services"
     esh2t_frgt_sm
     esgat_frgt_sm
 
-*** Buildings module: Energy services (useful energy)
-    ueshheb  "buildings space heating district heat"
-    ueshhob  "buildings space heating liquids"
-    ueshsob  "buildings space heating solids"
-    ueshstb  "buildings space heating traditional solids"
-    ueshgab  "buildings space heating district heat"
-    ueshh2b  "buildings space heating hydrogen"
-    ueshelb  "buildings space heating electricity resistance"
-    ueshhpb  "buildings space heating electricity heat pump"
-
-    uecwhob  "buildings cooking and water heating liquids"
-    uecwsob  "buildings cooking and water heating solids"
-    uecwstb  "buildings cooking and water heating traditional solids"
-    uecwgab  "buildings cooking and water heating gas"
-    uecwheb  "buildings cooking and water heating district heat"
-    uecwh2b  "buildings cooking and water heating hydrogen"
-    uecwelb  "buildings cooking and water heating electricity"
-    uecwhpb  "buildings cooking and water heating heat pump"
-/
-
-all_sectorEmi "all sectors with emissions"
-/   indst        "emissions from industry sector"
-    res          "emissions from residential sector"
-    trans        "emissions from transport sector"
-    power        "emissions from power sector"
-    solvents     "emissions from solvents"
-    extraction   "emissions from fuel extraction"
-    indprocess   "process emissions from industry"
-    waste        "emissions from waste"
-/
-
-all_exogEmi "all exogenous emission types"
-/   Agriculture      "Exogenous emissions from Agriculture"
-    AgWasteBurning   "Exogenous emissions from Ag Waste Burning"
-    ForestBurning    "Exogenous emissions from Forest Burning"
-    GrasslandBurning "Exogenous emissions from Grassland Burning"
 /
 
 all_in   "all inputs and outputs of the CES function"
@@ -576,36 +527,6 @@ all_in   "all inputs and outputs of the CES function"
     enhi                    "industry heat energy use"
     enhgai                  "industry heat gaseous energy use (fegab and feh2b)"
 
-    fehcsob                 "buildings heating and cooking solids final energy"
-    fehcelb                 "buildings heating and cooking electricity final energy"
-    fehcheb                 "buildings heating and cooking district heat final energy"
-    fehcgab                 "buildings heating and cooking gas final energy"
-    fehchob                 "buildings heating and cooking liquids final energy"
-    fealelb                 "buildings appliances and light electricity final energy"
-    fecwsob                 "buildings cooking and water heating solids final energy"
-    fecwelb                 "buildings cooking and water heating electricity final energy"
-    fecwhpb                 "buildings cooking and water heating electricity heat pump final energy"
-    fecwheb                 "buildings cooking and water heating district heat final energy"
-    fecwgab                 "buildings cooking and water heating gas final energy"
-    fecwhob                 "buildings cooking and water heating liquids final energy"
-    fescelb                 "buildings space cooling electricity final energy"
-    feshsob                 "buildings space heating solids final energy"
-    feshelb                 "buildings space heating electricity final energy"
-    feshheb                 "buildings space heating district heat final energy"
-    feshgab                 "buildings space heating gas final energy"
-    feshhob                 "buildings space heating liquids final energy"
-    feshhpb                 "buildings space heating electricity heat pump final energy"
-
-    esswb                   "buildings weatherization energy service"
-    uehcb                   "buildings heating and cooking useful energy"
-    uecwb                   "buildings cooking and water heating useful energy"
-    uescb                   "buildings space cooling useful energy"
-    ueshb                   "buildings space heating useful energy"
-    uealb                   "buildings appliances and light, useful energy"
-    ueswb                   "buildings weatherization"
-    feshh2b                 "buildings space heating hydrogen"
-    fecwb                   "buildings cooking and water heating FE"
-    fecwh2b                 "buildings cooking and water heating hydrogen"
 *** FIXME this should be reworked with Robert when revising the transport module
     entrp                   "transport energy use"
     fetf                    "transport fuel use"
@@ -1040,7 +961,10 @@ sets
     2021_cond, 2021_uncond,
     2022_cond, 2022_uncond,
     2023_cond, 2023_uncond,
-    2024_cond, 2024_uncond
+    2024_cond, 2024_uncond,
+    2025_cond, 2025_uncond,
+    2025_cond_extrapol, 2025_uncond_extrapol
+    2026_cond, 2026_uncond
   /
   NPi_version "NPi data version for NPi realizations of 40_techpol and 45_carbonprice"
   /
@@ -1209,12 +1133,12 @@ te(all_te)              "energy technologies"
     tdsynhos        "transmission and distribution for heating oil from synthetic origin to stationary users"
     tdh2s           "transmission and distribution for hydrogen to stationary users"
     tdh2t           "transmission and distribution for hydrogen to transportation"
-    tdbiodie        "transmission and distribution for diesel from biomass origin to stationary users"
-    tdfosdie        "transmission and distribution for diesel from fossil origin to stationary users"
-    tdsyndie        "transmission and distribution for diesel from synthetic origin to stationary users"
-    tdbiopet        "transmission and distribution for petrol from biomass origin to stationary users"
-    tdfospet        "transmission and distribution for petrol from fossil origin to stationary users"
-    tdsynpet        "transmission and distribution for petrol from synthetic origin to stationary users"
+    tdbiodie        "transmission and distribution for diesel from biomass origin to transportation"
+    tdfosdie        "transmission and distribution for diesel from fossil origin to transportation"
+    tdsyndie        "transmission and distribution for diesel from synthetic origin to transportation"
+    tdbiopet        "transmission and distribution for petrol from biomass origin to transportation"
+    tdfospet        "transmission and distribution for petrol from fossil origin to transportation"
+    tdsynpet        "transmission and distribution for petrol from synthetic origin to transportation"
     tdbiosos        "transmission and distribution for solids from biomass origin to stationary users"
     tdfossos        "transmission and distribution for solids from fossil origin to stationary users"
     tdhes           "transmission and distribution for heat to stationary users"
@@ -2028,20 +1952,6 @@ emiFuEx(all_enty)   "fugitive emissions"
     ch4gas     "fugitive emissions from gas production"
     ch4oil     "fugitive emissions from oil production"
 /
-sectorEndoEmi(all_sectorEmi)   "sectors with endogenous emissions"
-/
-    indst    "industry"
-    res      "residential"
-    trans    "transport"
-    power    "power"
-/
-sectorExogEmi(all_sectorEmi) "sectors with exogenous emissions"
-/
-    solvents
-    extraction
-    indprocess
-    waste
-/
 emi_sectors  "comprehensive sector set used for more detailed emissions accounting (REMIND-EU) and for CH4 tier 1 scaling - potentially to be integrated with similar set all_exogEmi"
 /
     power   "public electricity and heat production"
@@ -2368,6 +2278,11 @@ iteration     "iterator for main (Negishi/Nash) iterations"
 steps         "iterator for MAC steps"
 /
     1*801
+/
+
+magpieIter(iteration) "Nash iterations in which MAgPIE runs in core/presolve"
+/
+    %c_magpieIter%
 /
 ;
 
@@ -2950,45 +2865,6 @@ tsu2opTime5(tall,opTimeYr) "mapping for spinup time index to lifetime index"
     2000.6
     2005.1
 /
-
-sectorEndoEmi2te(all_enty,all_enty,all_te,sectorEndoEmi)   "map sectors to technologies"
-/
-    pegas.seel.ngcc.power
-    pegas.seel.ngt.power
-    seh2.seel.h2turb.power
-    pegas.seel.gaschp.power
-    pegas.sehe.gashp.power
-    pegas.segafos.gastr.indst
-    pegas.segafos.gastr.res
-    pecoal.seel.pc.power
-    pecoal.seel.coalchp.power
-    pecoal.sehe.coalhp.power
-    pecoal.sesofos.coaltr.indst
-    pecoal.sesofos.coaltr.res
-    peoil.seliqfos.refliq.trans
-    peoil.seliqfos.refliq.indst
-    peoil.seliqfos.refliq.res
-    peoil.seel.dot.power
-    pebiolc.seel.biochp.power
-    pebiolc.sehe.biohp.power
-    pebiolc.sesobio.biotr.indst
-    pebiolc.sesobio.biotr.res
-    pebiolc.sesobio.biotrmod.indst
-    seliqbio.fehos.tdbiohos.indst
-    seliqfos.fehos.tdfoshos.indst
-    seliqsyn.fehos.tdsynhos.indst
-    seliqbio.fehos.tdbiohos.res
-    seliqfos.fehos.tdfoshos.res
-    seliqsyn.fehos.tdsynhos.res
-    seliqbio.fedie.tdbiodie.trans
-    seliqfos.fedie.tdfosdie.trans
-    seliqsyn.fedie.tdsyndie.trans
-    seliqbio.fepet.tdbiopet.trans
-    seliqfos.fepet.tdfospet.trans
-    seliqsyn.fepet.tdsynpet.trans
-/
-
-
 
 ue2ppfen(all_enty,all_in)      "matching UE in ESM to ppfEn in MACRO"
 //

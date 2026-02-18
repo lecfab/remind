@@ -994,10 +994,8 @@ $if %cm_LU_emi_scen% == "SSP3"   p_efFossilFuelExtr(regi,"pebiolc","n2obio") = 0
 $if %cm_LU_emi_scen% == "SSP5"   p_efFossilFuelExtr(regi,"pebiolc","n2obio") = 0.0066/sm_EJ_2_TWa;
 $if %cm_LU_emi_scen% == "SDP"    p_efFossilFuelExtr(regi,"pebiolc","n2obio") = 0.0047/sm_EJ_2_TWa;
 
-*DK* In case REMIND is coupled to MAgPIE emissions are obtained from the MAgPIE reporting. Thus, emission factors are set to zero
-$if %cm_MAgPIE_coupling% == "on" p_efFossilFuelExtr(regi,"pebiolc","n2obio") = 0.0;
-
-display p_efFossilFuelExtr;
+*** In case REMIND is coupled to MAgPIE emissions are obtained from the MAgPIE reporting. 
+*** Thus, emission factors are set to zero in core/presolve.gms after MAgPIE has run at least one.
 
 *** capacity factors (nur) are 1 by default
 pm_dataren(regi,"nur",rlf,te)     = 1;
@@ -1115,20 +1113,20 @@ $offdelim
 /;
 
 *** Capacity factor for wind and solar
-*** Effective capacity factor pm_dataren("nur") * pm_cf scales from historical values in 2015 to grade-based values in 2030
+*** Effective capacity factor pm_dataren("nur") * pm_cf scales from historical values in 2015 to grade-based values in 2040
 ***   pm_dataren("nur",rlf) is the capacity factor of a given rlf grade
-***   pm_cf is a multiplier that scales linearly from p_aux_capacityFactorHistOverREMIND in 2015 to 1 in 2030
+***   pm_cf is a multiplier that scales linearly from p_aux_capacityFactorHistOverREMIND in 2015 to 1 in 2040
 *** This scaling accounts for lag effects, for instance turbines in the 2000s were much smaller hence yielding lower capacity factors
 p_aux_capacityFactorHistOverREMIND(regi,teVRE) = 1;
 p_aux_capacityFactorHistOverREMIND(regi,teVRE) $ (p_histCapFac("2015",regi,teVRE) and p_avCapFac2015(regi,teVRE)) =
   p_histCapFac("2015",regi,teVRE) / p_avCapFac2015(regi,teVRE);
 
-loop(t $ (t.val ge 2015 AND t.val lt 2030),
+loop(t $ (t.val ge 2015 AND t.val lt 2040),
   pm_cf(t,regi,teVRE) =
     pm_cf(t,regi,teVRE) !! always 1 for VRE in f_cf, but could be modified by modules
-    * ( (2030 - pm_ttot_val(t)) * p_aux_capacityFactorHistOverREMIND(regi,teVRE)
+    * ( (2040 - pm_ttot_val(t)) * p_aux_capacityFactorHistOverREMIND(regi,teVRE)
       + (pm_ttot_val(t) - 2015)
-    ) / (2030 - 2015)
+    ) / (2040 - 2015)
 );
 
 *CG* set storage and grid of windoff to be the same as windon
@@ -1384,11 +1382,6 @@ if(c_macscen eq 1,
   pm_macSwitch(ttot,regi,emiMacSector) = 1;
 );
 
-*** for NDC and NPi switch off landuse MACs
-$if %carbonprice% == "off"      pm_macSwitch(ttot,regi,emiMacMagpie) = 0;
-$if %carbonprice% == "NDC"      pm_macSwitch(ttot,regi,emiMacMagpie) = 0;
-$if %carbonprice% == "NPi"      pm_macSwitch(ttot,regi,emiMacMagpie) = 0;
-
 *** Load historical carbon prices defined in $/t CO2, need to be rescaled to right unit
 pm_taxCO2eq(ttot,regi)$(ttot.val le 2020) = 0;
 parameter fm_taxCO2eqHist(ttot,all_regi)       "historic CO2 prices [$/tCO2]"
@@ -1399,23 +1392,14 @@ $offdelim
 /;
 pm_taxCO2eq(ttot,regi)$(ttot.val le 2020) = fm_taxCO2eqHist(ttot,regi) * sm_DptCO2_2_TDpGtC;
 
-*DK* LU emissions are abated in MAgPIE in coupling mode
-*** An alternative to the approach below could be to introduce a new value for c_macswitch that only deactivates the LU MACs
-$if %cm_MAgPIE_coupling% == "on"  pm_macSwitch(ttot,regi,enty)$emiMacMagpie(enty) = 0;
 *** As long as there is hardly any CO2 LUC reduction in MAgPIE we dont need MACs in REMIND
-$if %cm_MAgPIE_coupling% == "off"  pm_macSwitch(ttot,regi,"co2luc") = 0;
+pm_macSwitch(ttot,regi,"co2luc") = 0;
 *** The tiny fraction n2ofertsom of total land use n2o can get slightly negative in some cases. Ignore MAC for n2ofertsom by default.
-$if %cm_MAgPIE_coupling% == "off"  pm_macSwitch(ttot,regi,"n2ofertsom") = 0;
+pm_macSwitch(ttot,regi,"n2ofertsom") = 0;
+
 
 * GA: Deactivate MAC abatement for historical periods, assuming no abatement happens until 2030
 pm_macSwitch(ttot,regi,emiMacSector)$(ttot.val le 2025) = 0;
-
-* GA: Use long term (2050) pm_macSwitch to set p_macCostSwitch, as some MACCs
-* are turned off in the short term 
-p_macCostSwitch(enty)=pm_macSwitch("2050","USA",enty);
-pm_macSwitch(ttot,regi,"co2cement_process") =0 ;
-p_macCostSwitch("co2cement_process") =0 ;
-
 
 *** load econometric emission data
 *** read in p3 and p4
@@ -1468,19 +1452,18 @@ $offdelim
 /;
 p_macBaseExo(ttot,regi,emiMacExo(enty))$(ttot.val ge 2005) = f_macBaseExo(ttot,regi,emiMacExo,"%cm_LU_emi_scen%");
 
-$if %cm_MAgPIE_coupling% == "off" parameter f_macBaseMagpie(tall,all_regi,all_enty,all_LU_emi_scen,all_rcp_scen)    "baseline emissions of N2O and CH4 from landuse based on data from Magpie"
-$if %cm_MAgPIE_coupling% == "on"  parameter f_macBaseMagpie_coupling(tall,all_regi,all_enty)                        "baseline emissions of N2O and CH4 from landuse based on data from Magpie"
+
+parameter f_macBaseMagpie(tall,all_regi,all_enty,all_LU_emi_scen,all_rcp_scen)    "baseline emissions of N2O and CH4 from landuse based on data from Magpie"
 /
 $ondelim
-$if %cm_MAgPIE_coupling% == "off" $include "./core/input/f_macBaseMagpie.cs4r"
-$if %cm_MAgPIE_coupling% == "on"  $include "./core/input/f_macBaseMagpie_coupling.cs4r"
+$include "./core/input/f_macBaseMagpie.cs4r"
 $offdelim
 /;
-$if %cm_MAgPIE_coupling% == "off" pm_macBaseMagpie(ttot,regi,emiMacMagpie(enty))$(ttot.val ge 2005) = f_macBaseMagpie(ttot,regi,emiMacMagpie,"%cm_LU_emi_scen%","%cm_rcp_scen%");
-$if %cm_MAgPIE_coupling% == "on"  pm_macBaseMagpie(ttot,regi,emiMacMagpie(enty))$(ttot.val ge 2005) = f_macBaseMagpie_coupling(ttot,regi,emiMacMagpie);
+pm_macBaseMagpie(ttot,regi,emiMacMagpie(enty))$(ttot.val ge 2005) = f_macBaseMagpie(ttot,regi,emiMacMagpie,"%cm_LU_emi_scen%","%cm_rcp_scen%");
 
-$if %cm_MAgPIE_coupling% == "off" p_co2lucSub(ttot,regi,emiMacMagpieCO2Sub(all_enty))$(ttot.val ge 2005) = f_macBaseMagpie(ttot,regi,emiMacMagpieCO2Sub,"%cm_LU_emi_scen%","%cm_rcp_scen%");
-$if %cm_MAgPIE_coupling% == "on"  p_co2lucSub(ttot,regi,emiMacMagpieCO2Sub(all_enty))$(ttot.val ge 2005) = f_macBaseMagpie_coupling(ttot,regi,emiMacMagpieCO2Sub);
+*** pm_macBaseMagpie gets updated in core/presolve.gms when coupling to MAgPIE is active
+
+p_co2lucSub(ttot,regi,emiMacMagpieCO2Sub(all_enty))$(ttot.val ge 2005) = f_macBaseMagpie(ttot,regi,emiMacMagpieCO2Sub,"%cm_LU_emi_scen%","%cm_rcp_scen%");
 
 *** p_macPolCO2luc defines the lower limit for abatement of CO2 landuse change emissions in REMIND
 *** The values are derived from MAgPIE runs with very strong mitigation
