@@ -28,7 +28,7 @@ calculate_CES_configuration <- function(cfg, path = getwd(), check = FALSE) {
     gdxConfig <- paste0("config/gdx-files/", CESstring, ".gdx")
     
     # Check if the configuration gdx file exists
-    if(!file.exists(gdxConfig) & cfg$gms$CES_parameters == "calibrate") {
+    if (!file.exists(gdxConfig) && cfg$gms$CES_parameters == "calibrate") {
         cat("Calibration requires a starting gdx that does not exist:\n    ", gdxConfig, "\n")
         abortText <- "Please copy the gdx file with the closest configuration and paste it to that file.\n"
         
