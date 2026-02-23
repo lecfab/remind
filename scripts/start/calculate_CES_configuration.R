@@ -24,38 +24,5 @@ calculate_CES_configuration <- function(cfg, path = getwd(), check = FALSE) {
              substr(path, 1, nchar(path) - (nchar(CESfile) - 255)))
     }
 
-    ######## Retrieve appropriate gdx file ########
-    gdxConfig <- file.path("config/gdx-files", paste0(CESstring, ".gdx"))
-    
-    # Check if the configuration gdx file exists
-    if (!file.exists(file.path(path, gdxConfig)) && cfg$gms$CES_parameters == "calibrate") {
-        cat("Calibration requires a starting gdx that does not exist:\n    ", gdxConfig, "\n")
-        abortText <- "Please copy the gdx file with the closest configuration and paste it to that file.\n"
-        
-        # List available gdx files
-        gdxFiles <- list.files(file.path(path, "config/gdx-files"), pattern = "\\.gdx$", full.names = TRUE)
-        if (length(gdxFiles) == 0) { stop(abortText) }
-    
-        # Prompt user to choose an existing gdx file
-        gdxClosest <- gdxFiles[which.min(adist(gdxConfig, gdxFiles))] # existing file with the closest name
-        abortOption <- paste0(crayon::red("ABORT"), ": you will then need to copy the gdx of your choice manually")
-        gdxFiles <- c(abortOption, gdxFiles)
-
-        gdxSelection <- gdxFiles[gms::chooseFromList(
-            ifelse(gdxFiles == gdxClosest, crayon::cyan(gdxFiles), gdxFiles),
-            type = "an existing gdx file that you would like to use",
-            userinfo = paste0("Leave empty to select existing gdx with ", crayon::cyan("closest name")),
-            returnBoolean = TRUE,
-            multiple = FALSE
-        )]
-
-        if (length(gdxSelection) == 0) { gdxSelection <- gdxClosest } # default option
-        if (gdxSelection == abortOption) { stop(abortText) } # abort option
-  
-        if (file.copy(gdxSelection, file.path(path, gdxConfig))) {
-            message("Copied: ", gdxSelection, "\n    to: ", gdxConfig, "\n")
-        }
-    }
-
     return(CESstring)
 }
