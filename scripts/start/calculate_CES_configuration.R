@@ -21,7 +21,7 @@ calculate_CES_configuration <- function(cfg, path = getwd(), check = FALSE) {
         stop("Filename of CES file has more than 255 characters, which will cause GAMS to fail on loading it.\n",
              "Rename and shorten the path to your REMIND directory by ",
              (nchar(CESfile) - 255), " characters, for instance:\n    ",
-             substr(path, 1, nchar(path) - (nchar(CESfile) - 255)), "'")
+             substr(path, 1, nchar(path) - (nchar(CESfile) - 255)))
     }
 
     ######## Retrieve appropriate gdx file ########
