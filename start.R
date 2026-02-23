@@ -394,36 +394,39 @@ if (any(c("--reprepare", "--restart") %in% flags)) {
 
         # List available gdx files
         gdxFiles <- list.files(gdxFolder, pattern = "\\.gdx$", full.names = TRUE)
-        if (length(gdxFiles) == 0) { nonStoppingError(abortText) }
+        if (length(gdxFiles) == 0) {
+          nonStoppingError(abortText)
+        } else {
 
-        # Prompt user to choose an existing gdx file
-        gdxClosest <- gdxFiles[which.min(adist(gdxConfig, gdxFiles))] # existing file with the closest name
-        abortOption <- paste0(crayon::red("ABORT"), ": you will then need to copy the gdx of your choice manually")
-        gdxFiles <- c(abortOption, gdxFiles)
-        gdxSelection <- gdxFiles[gms::chooseFromList(
-          ifelse(gdxFiles == gdxClosest, crayon::cyan(gdxFiles), gdxFiles),
-          type = "an existing gdx file that you would like to use",
-          userinfo = paste0("Leave empty to select existing gdx with ", crayon::cyan("most similar name")),
-          returnBoolean = TRUE,
-          multiple = FALSE
-        )]
+          # Prompt user to choose an existing gdx file
+          gdxClosest <- gdxFiles[which.min(adist(gdxConfig, gdxFiles))] # existing file with the closest name
+          abortOption <- paste0(crayon::red("ABORT"), ": you will then need to copy the gdx of your choice manually")
+          gdxFiles <- c(abortOption, gdxFiles)
+          gdxSelection <- gdxFiles[gms::chooseFromList(
+            ifelse(gdxFiles == gdxClosest, crayon::cyan(gdxFiles), gdxFiles),
+            type = "an existing gdx file that you would like to use",
+            userinfo = paste0("Leave empty to select existing gdx with ", crayon::cyan("most similar name")),
+            returnBoolean = TRUE,
+            multiple = FALSE
+          )]
 
-        if (length(gdxSelection) == 0) { gdxSelection <- gdxClosest } # default option
-        if (gdxSelection == abortOption) { nonStoppingError(abortText) } # abort option
+          if (length(gdxSelection) == 0) { gdxSelection <- gdxClosest } # default option
+          if (gdxSelection == abortOption) { nonStoppingError(abortText) } # abort option
 
-        if (file.copy(gdxSelection, gdxConfig)) {
-          message("Copied: ", gdxSelection, "\n    to: ", gdxConfig, "\n")
+          if (file.copy(gdxSelection, gdxConfig)) {
+            message("Copied: ", gdxSelection, "\n    to: ", gdxConfig, "\n")
 
-          # Add the .gdx and .inc to list of possible names
-          addLine <- function(line, path = "files") {
-            if (!file.exists(path)) message(path, " does not exist, you may have to manually add ", line)
-            else if (!(line %in% readLines(path))) {
-              write(line, path, append = TRUE)
-              message("Added in ", path, " the line ", line)
+            # Add the .gdx and .inc to list of possible names
+            addLine <- function(line, path = "files") {
+              if (!file.exists(path)) message(path, " does not exist, you may have to manually add ", line)
+              else if (!(line %in% readLines(path))) {
+                write(line, path, append = TRUE)
+                message("Added in ", path, " the line ", line)
+              }
             }
+            addLine(paste0(cfg$gms$cm_CES_configuration, ".gdx"), path = file.path(gdxFolder, "files"))
+            addLine(paste0(cfg$gms$cm_CES_configuration, ".inc"), path = file.path("./modules/29_CES_parameters/load/input", "files"))
           }
-          addLine(paste0(cfg$gms$cm_CES_configuration, ".gdx"), path = file.path(gdxFolder, "files"))
-          addLine(paste0(cfg$gms$cm_CES_configuration, ".inc"), path = file.path("./modules/29_CES_parameters/load/input", "files"))
         }
       }
     }
