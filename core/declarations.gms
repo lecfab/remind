@@ -666,8 +666,8 @@ sm_dmac                      "step in MAC functions [US$]"
 sm_macChange                 "maximum yearly increase of relative abatement in percentage points of maximum abatement. [0..1]"      /0.05/
 
 *** technology cost markup parameters (used in datainput.gms for pm_inco0_t)
-s_markupDecayYrs             "years after availableYr until investment cost markup reaches 1.0 for advanced technologies [yr]"  /10/
-s_markupInitial              "investment cost markup factor applied when a technology first becomes commercially available [1]"   /1.6/
+s_markupDecayYrs             "years after availableYr until investment cost markup reaches 1.0 for advanced technologies [yr]"  /15/
+s_markupInitial              "investment cost markup factor applied when a technology first becomes commercially available [1]"   /1.9/
 
 s_co2pipe_leakage            "Leakage rate of CO2 pipelines. [0..1]"
 s_tau_cement                 "range of per capita investments for switching from short-term to long-term behavior in CO2 cement emissions"                / 12000 /

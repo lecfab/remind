@@ -491,10 +491,10 @@ $endif.REG_techcosts
 *** At t=availableYr markup equals s_markupInitial, then decays linearly to 1.0 over s_markupDecayYrs years.
 *** markup=1 for mature techs (availableYr=0) and for t > availableYr + s_markupDecayYrs.
 *** Comparison to old p_costMarkupAdvTech.prn values (tech_stat row, years 2005/2010/2015/2020/2025/2030):
-***   tech_stat=1 (availableYr=2005): old=[1.9, 1.6, 1.3, 1.1, 1.0, 1.0], new=[1.6, 1.3, 1.0, 1.0, 1.0, 1.0]
-***   tech_stat=2 (availableYr=2015): old=[2.0, 2.0, 1.9, 1.6, 1.3, 1.1], new=[1.6, 1.6, 1.6, 1.3, 1.0, 1.0]
-***   tech_stat=3 (availableYr=2020): old=[2.3, 2.3, 2.2, 1.8, 1.5, 1.2], new=[1.6, 1.6, 1.6, 1.6, 1.3, 1.0]
-***   tech_stat=5 (availableYr=2030): old=[2.3, 2.3, 2.2, 1.8, 1.5, 1.2], new=[1.6, 1.6, 1.6, 1.6, 1.6, 1.6]
+***   tech_stat=1 (availableYr=2005): old=[1.9, 1.6, 1.3, 1.1, 1.0, 1.0], new=[1.9, 1.6, 1.3, 1.0, 1.0, 1.0]
+***   tech_stat=2 (availableYr=2015): old=[2.0, 2.0, 1.9, 1.6, 1.3, 1.1], new=[1.9, 1.9, 1.9, 1.6, 1.3, 1.0]
+***   tech_stat=3 (availableYr=2020): old=[2.3, 2.3, 2.2, 1.8, 1.5, 1.2], new=[1.9, 1.9, 1.9, 1.9, 1.6, 1.3]
+***   tech_stat=5 (availableYr=2030): old=[2.3, 2.3, 2.2, 1.8, 1.5, 1.2], new=[1.9, 1.9, 1.9, 1.9, 1.9, 1.9]
 loop (teNoLearn(te),
   pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2005)
     = pm_inco0_t(ttot,regi,te)
