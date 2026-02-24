@@ -1789,7 +1789,7 @@ $setglobal cm_inco0RegiFactor  off  !! def = off
 $setglobal cm_ccsinjeCost med !! def = med !! regexp = med|low|high
 *' switch from standard to low and high CO2 transport & storage cost.
 *' Warning: it applies absolute values; only use it in combination with default c_techAssumptScen SSP2. 
-*'  * (low): old estimate before 03/2024; ~7.5 USD/tCO2 in 2035. Also applies tech_avail=2015 and constrTme=0
+*'  * (low): old estimate before 03/2024; ~7.5 USD/tCO2 in 2035. Also applies availableYr=2015 and constrTme=0
 *'  * (med): new main estimate; 12 USD/tCO2 at all times (similar to ~11.4 USD/tCO2 average of saline formations, on- and offshore DOG fields in Budinis et al 2017)
 *'  * (high): upper estimate; ~20USD/tCO2 (constant), assuming upper end of storage cost and long transport distances
 $setglobal cm_CCS_markup  off  !! def = off

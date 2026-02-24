@@ -34,7 +34,7 @@ vm_omcosts_cdr.fx(t,regi)$((t.val lt 2025)) = 0;
 vm_cap.fx(t,regi,"weathering",rlf)$(t.val lt 2025) = 0;
 vm_co2emi_cdrFE_beforeCapture.fx(t,regi,te_used33)$(t.val lt 2025) = 0;
 v33_co2emi_non_atm_calcination.fx(t,regi,te_oae33)$(t.val lt 2025) = 0;
-*** vm_cap for dac is fixed for t<2025 in core/bounds.gms (tech_avail eq 2025)
+*** vm_cap for dac is fixed for t<2025 in core/bounds.gms (availableYr eq 2025)
 vm_co2capture_cdr.fx(t,regi,enty,enty2,te,rlf)$(ccs2te(enty,enty2,te) AND t.val lt 2025) = 0;
 
 *** Set minimum DAC capacities (if available) to help the solver find the technology and exclude fegas and feh2s for low-temperature dac

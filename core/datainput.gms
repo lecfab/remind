@@ -241,7 +241,7 @@ $endif.c_techAssumptScen
 *** cm_ccsinjeCost cost scenarios
 *** Warning: it applies absolute values; only use it in combination with default c_techAssumptScen SSP2. 
 *** low estimate: ccsinje cost prior to 03/2024; i.e. ~11 USD/tCO2 in 2025, decreasing to ~7.5USD/tCO2 as of 2035
-$if "%cm_ccsinjeCost%" == "low" fm_dataglob("tech_avail","ccsinje") = 2015;
+$if "%cm_ccsinjeCost%" == "low" fm_dataglob("availableYr","ccsinje") = 2015;
 $if "%cm_ccsinjeCost%" == "low" fm_dataglob("inco0","ccsinje") = 220;
 $if "%cm_ccsinjeCost%" == "low" fm_dataglob("constrTme","ccsinje") = 0;
 *** high estimate: ~20USD/tCO2 (constant), assuming upper end of storage cost and long transport distances
@@ -434,9 +434,9 @@ $else
 display p_capCum;
 $endif
 
-*FS* initialize learning curve for most advanced technologies as defined by tech_avail = 2025 in generisdata_tech.prn (with very small real-world capacities in 2020)
+*FS* initialize learning curve for most advanced technologies as defined by availableYr = 2025 in generisdata_tech.prn (with very small real-world capacities in 2020)
 *** equally for all regions based on global cumulative capacity of ccap0 and incolearn (difference between initial investment cost and floor cost)
-pm_data(regi,"learnMult_wFC",te)$( pm_data(regi,"tech_avail",te) eq 2025 )
+pm_data(regi,"learnMult_wFC",te)$( pm_data(regi,"availableYr",te) eq 2025 )
   = pm_data(regi,"incolearn",te)
   / ( fm_dataglob("ccap0",te)
    ** pm_data(regi,"learnExp_wFC",te)
@@ -447,20 +447,19 @@ display pm_data;
 *** end learning parameters
 *** -------------------------------------------------------------------------------
 
-*** Markup for advanced technologies
-table p_costMarkupAdvTech(s_statusTe,tall)              "Multiplicative investment cost markup for early time periods (until 2030) on advanced technologies (CCS, Hydrogen) that are not modeled through endogenous learning"
-$include "./core/input/p_costMarkupAdvTech.prn"
+*** Markup for advanced technologies: investment cost premium proportional to years until commercial availability.
+*** markup(availableYr, t) = max(1, 1 + max(0, availableYr + s_markupDecayYrs - t) * s_markupRatePerYr)
+*** markup=1 for mature techs (availableYr=0 or blank), decays linearly to 1.0 s_markupDecayYrs years
+*** after the availability year (e.g. availableYr=2020 reaches markup=1.0 at t=2030 with s_markupDecayYrs=10).
+scalar
+  s_markupDecayYrs  "years after availableYr until cost markup reaches 1.0"  / 10 /
+  s_markupRatePerYr "fractional cost markup increase per year before maturity" / 0.06 /
 ;
-
 loop (teNoLearn(te),
   pm_inco0_t(ttot,regi,te) = pm_data(regi,"inco0",te);
-  loop (ttot$( ttot.val ge 2005 AND ttot.val lt 2035 ),
-    pm_inco0_t(ttot,regi,te)
-    = sum(s_statusTe$( s_statusTe.val eq pm_data(regi,"tech_avail",te) ),
-        p_costMarkupAdvTech(s_statusTe,ttot)
-      * pm_inco0_t(ttot,regi,te)
-      );
-  );
+  pm_inco0_t(ttot,regi,te) $ (ttot.val ge 2005)
+    = pm_inco0_t(ttot,regi,te)
+      * max(1, 1 + max(0, pm_data(regi,"availableYr",te) + s_markupDecayYrs - ttot.val) * s_markupRatePerYr);
 );
 display pm_inco0_t;
 
@@ -496,17 +495,11 @@ $ifthen.REG_techcosts "%cm_techcosts%" == "REG"   !! cm_techcosts REG
       pm_inco0_t(ttot,regi,te)$( ttot.val gt c_teNoLearngConvEndYr ) = fm_dataglob("inco0",te);
     );
 
-*** re-insert effect of costMarkupAdvTech for IGCC in the regionalized cost
+*** re-insert effect of cost markup for IGCC in the regionalized cost
 *** data, as the IEA numbers have unrealistically low IGCC costs in 2005-2020
-    loop (teNoLearn(te)$( sameas(te,"igcc") ),
-      loop (ttot$( ttot.val ge 2005 AND ttot.val lt 2035 ),
-        pm_inco0_t(ttot,regi,te)
-        = sum(s_statusTe$( s_statusTe.val eq pm_data(regi,"tech_avail",te) ),
-            p_costMarkupAdvTech(s_statusTe,ttot)
-          * pm_inco0_t(ttot,regi,te)
-          );
-      );
-    );
+    pm_inco0_t(ttot,regi,"igcc") $ (ttot.val ge 2005 AND ttot.val lt 2035)
+      = pm_inco0_t(ttot,regi,"igcc")
+        * max(1, 1 + max(0, pm_data(regi,"availableYr","igcc") + s_markupDecayYrs - ttot.val) * s_markupRatePerYr);
 $endif.REG_techcosts
 
 *------------------------------------------------------------------------------------
