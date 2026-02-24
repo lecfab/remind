@@ -13,7 +13,7 @@ omv_d       Variable operation and maintenance costs given in $(2015)/kWa energy
 lifetime    Given in years
 $offtext
 +                       pipe_gas                termX_lng                 vess_lng               termM_lng
-availableYr                     0                        0                        0                       0
+availableYr                   0                        0                        0                       0
 inco0                        20                      167                        0                     0.1
 inco0_d                     100                        0                        0                       0
 constrTme                     3                        3                        0                       3
