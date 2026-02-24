@@ -1,6 +1,5 @@
 *** SOF ./core/input/generisdata_trade.prn
 $ontext
-availableYr year when technology is assumed to be commercially available at scale (past years mean the technology is already mature; 0 means available at model start)
 inco0       Initial investment costs given in $(2015)/kW(output) capacity. Independent of distance.
 inco0_d     Initial investment costs given in $(2015)/kW(output) capacity. Per 1000km.
 constrTme   Construction time in years, needed to calculate turn-key cost premium compared to overnight costs
@@ -13,7 +12,6 @@ omv_d       Variable operation and maintenance costs given in $(2015)/kWa energy
 lifetime    Given in years
 $offtext
 +                       pipe_gas                termX_lng                 vess_lng               termM_lng
-availableYr                   0                        0                        0                       0
 inco0                        20                      167                        0                     0.1
 inco0_d                     100                        0                        0                       0
 constrTme                     3                        3                        0                       3
