@@ -434,9 +434,9 @@ $else
 display p_capCum;
 $endif
 
-*FS* initialize learning curve for most advanced technologies as defined by availableYr = 2025 in generisdata_tech.prn (with very small real-world capacities in 2020)
+*FS* Initialise learning curve for technologies not yet deployed in 2020 (availableYr > 2020),
 *** equally for all regions based on global cumulative capacity of ccap0 and incolearn (difference between initial investment cost and floor cost)
-pm_data(regi,"learnMult_wFC",te)$( pm_data(regi,"availableYr",te) eq 2025 )
+pm_data(regi,"learnMult_wFC",te) $ (pm_data(regi,"availableYr",te) > 2020)
   = pm_data(regi,"incolearn",te)
   / ( fm_dataglob("ccap0",te)
    ** pm_data(regi,"learnExp_wFC",te)
@@ -447,7 +447,7 @@ display pm_data;
 *** end learning parameters
 *** -------------------------------------------------------------------------------
 
-*** Initialize investment costs from global data for all non-learning technologies
+*** Initialise investment costs from global data for all non-learning technologies
 loop (teNoLearn(te),
   pm_inco0_t(ttot,regi,te) = pm_data(regi,"inco0",te);
 );
@@ -456,7 +456,7 @@ loop (teNoLearn(te),
 $ifthen.REG2040_techcosts "%cm_techcosts%" == "REG2040"   !! cm_techcosts REG2040
 *** for 2015-2040, use differentiated costs when available for a specific non-learning technology
     loop(te $ (teNoLearn(te) and teRegTechCosts(te)),
-      pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2015 and ttot.val < 2045)
+      pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2015 and ttot.val <= 2040)
       = p_inco0(ttot,regi,te);
 
 *** after 2040, keep the same regionally differentiated costs
@@ -487,12 +487,18 @@ $endif.REG_techcosts
 
 *** Apply markup for advanced technologies after regional cost differentiation, so the markup
 *** is consistently applied on top of any cost base (global or regional).
-*** markup(availableYr, t) = max(1, 1 + max(0, availableYr + s_markupDecayYrs - t) * s_markupRatePerYr)
-*** markup=1 for mature techs (availableYr=0), decays linearly to 1.0 s_markupDecayYrs years after availableYr.
+*** Formula: markup(availableYr, t) = max(1, s_markupInitial - (s_markupInitial - 1) * max(0, t - availableYr) / s_markupDecayYrs)
+*** At t=availableYr markup equals s_markupInitial, then decays linearly to 1.0 over s_markupDecayYrs years.
+*** markup=1 for mature techs (availableYr=0) and for t > availableYr + s_markupDecayYrs.
+*** Comparison to old p_costMarkupAdvTech.prn values (tech_stat row, years 2005/2010/2015/2020/2025/2030):
+***   tech_stat=1 (availableYr=2005): old=[1.9, 1.6, 1.3, 1.1, 1.0, 1.0], new=[1.6, 1.3, 1.0, 1.0, 1.0, 1.0]
+***   tech_stat=2 (availableYr=2015): old=[2.0, 2.0, 1.9, 1.6, 1.3, 1.1], new=[1.6, 1.6, 1.6, 1.3, 1.0, 1.0]
+***   tech_stat=3 (availableYr=2020): old=[2.3, 2.3, 2.2, 1.8, 1.5, 1.2], new=[1.6, 1.6, 1.6, 1.6, 1.3, 1.0]
+***   tech_stat=5 (availableYr=2030): old=[2.3, 2.3, 2.2, 1.8, 1.5, 1.2], new=[1.6, 1.6, 1.6, 1.6, 1.6, 1.6]
 loop (teNoLearn(te),
   pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2005)
     = pm_inco0_t(ttot,regi,te)
-      * max(1, 1 + max(0, pm_data(regi,"availableYr",te) + s_markupDecayYrs - ttot.val) * s_markupRatePerYr);
+      * max(1, s_markupInitial - (s_markupInitial - 1) * max(0, ttot.val - pm_data(regi,"availableYr",te)) / s_markupDecayYrs);
 );
 display pm_inco0_t;
 
