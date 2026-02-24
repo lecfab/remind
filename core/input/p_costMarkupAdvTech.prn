@@ -1,11 +1,17 @@
 *** SOF ./core/input/p_costMarkupAdvTech.prn
 *** p_costMarkupAdvTech.prn
+*** Row indices are tech_avail years (year when technology becomes commercially available at scale).
+*** 0 means available at model start (no markup applied).
+*** Note: 2025 and 2030 rows use the same markup as 2020, since these technologies face similar
+*** cost uncertainty during early deployment phases; values can be refined based on future analysis.
 
-     2005    2010    2015   2020    2025   2030
-0     1.0     1.0     1.0    1.0    1.0    1.0
-1     1.9     1.6     1.3    1.1    1.0    1.0
-2     2.0     2.0     1.9    1.6    1.3    1.1 
-3     2.3     2.3     2.2    1.8    1.5    1.2  
+        2005    2010    2015   2020    2025   2030
+0       1.0     1.0     1.0    1.0    1.0    1.0
+2000    1.9     1.6     1.3    1.1    1.0    1.0
+2015    2.0     2.0     1.9    1.6    1.3    1.1 
+2020    2.3     2.3     2.2    1.8    1.5    1.2  
+2025    2.3     2.3     2.2    1.8    1.5    1.2  
+2030    2.3     2.3     2.2    1.8    1.5    1.2  
 
 
 *** EOF ./core/input/p_costMarkupAdvTech.prn

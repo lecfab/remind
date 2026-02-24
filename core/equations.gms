@@ -373,9 +373,9 @@ qm_deltaCapCumNet(ttot,regi,teLearn)$(ord(ttot) lt card(ttot) AND pm_ttot_val(tt
 
 ***---------------------------------------------------------------------------
 *' Initial values for cumulated capacities (learning technologies only):
-*' (except for tech_stat 4 technologies that have no standing capacities in 2005 and ccap0 refers to another year)
+*' (except for tech_avail 2025 technologies that have no standing capacities in 2005 and ccap0 refers to another year)
 ***---------------------------------------------------------------------------
-q_capCumNet(t0,regi,teLearn)$(NOT (pm_data(regi,"tech_stat",teLearn) eq 4))..
+q_capCumNet(t0,regi,teLearn)$(NOT (pm_data(regi,"tech_avail",teLearn) eq 2025))..
   vm_capCum(t0,regi,teLearn)
   =e=
   pm_data(regi,"ccap0",teLearn);
@@ -415,7 +415,7 @@ q_limitGeopot(t,regi,peReComp(enty),rlf)..
 *' @equations
 ***---------------------------------------------------------------------------
 *' Learning curve for investment costs:
-*' (deactivate learning for tech_stat 4 technologies before 2025 as they are not built before)
+*' (deactivate learning for tech_avail 2025 technologies before 2025 as they are not built before)
 ***---------------------------------------------------------------------------
 
 *' Learning technologies follow a “one-factor learning curve”[^1] (or “experience curve”).
@@ -455,7 +455,7 @@ q_limitGeopot(t,regi,peReComp(enty),rlf)..
 *' In equations.gms, the investment costs equation `q_costTeCapital` corresponds to $I = a'\times C^{b'} + F$,
 *' with variations depending on time period and floor cost scenarios.
 
-q_costTeCapital(t,regi,teLearn)$(NOT (pm_data(regi,"tech_stat",teLearn) eq 4 AND t.val le 2020)) ..
+q_costTeCapital(t,regi,teLearn)$(NOT (pm_data(regi,"tech_avail",teLearn) eq 2025 AND t.val le 2020)) ..
   vm_costTeCapital(t,regi,teLearn)
   =e=
 *** until 2005: using global estimates better matches historic values

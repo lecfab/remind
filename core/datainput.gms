@@ -241,7 +241,7 @@ $endif.c_techAssumptScen
 *** cm_ccsinjeCost cost scenarios
 *** Warning: it applies absolute values; only use it in combination with default c_techAssumptScen SSP2. 
 *** low estimate: ccsinje cost prior to 03/2024; i.e. ~11 USD/tCO2 in 2025, decreasing to ~7.5USD/tCO2 as of 2035
-$if "%cm_ccsinjeCost%" == "low" fm_dataglob("tech_stat","ccsinje") = 2;
+$if "%cm_ccsinjeCost%" == "low" fm_dataglob("tech_avail","ccsinje") = 2015;
 $if "%cm_ccsinjeCost%" == "low" fm_dataglob("inco0","ccsinje") = 220;
 $if "%cm_ccsinjeCost%" == "low" fm_dataglob("constrTme","ccsinje") = 0;
 *** high estimate: ~20USD/tCO2 (constant), assuming upper end of storage cost and long transport distances
@@ -434,9 +434,9 @@ $else
 display p_capCum;
 $endif
 
-*FS* initialize learning curve for most advanced technologies as defined by tech_stat = 4 in generisdata_tech.prn (with very small real-world capacities in 2020)
+*FS* initialize learning curve for most advanced technologies as defined by tech_avail = 2025 in generisdata_tech.prn (with very small real-world capacities in 2020)
 *** equally for all regions based on global cumulative capacity of ccap0 and incolearn (difference between initial investment cost and floor cost)
-pm_data(regi,"learnMult_wFC",te)$( pm_data(regi,"tech_stat",te) eq 4 )
+pm_data(regi,"learnMult_wFC",te)$( pm_data(regi,"tech_avail",te) eq 2025 )
   = pm_data(regi,"incolearn",te)
   / ( fm_dataglob("ccap0",te)
    ** pm_data(regi,"learnExp_wFC",te)
@@ -452,15 +452,11 @@ table p_costMarkupAdvTech(s_statusTe,tall)              "Multiplicative investme
 $include "./core/input/p_costMarkupAdvTech.prn"
 ;
 
-*** add mark-up cost for tech_stat 4 and 5 technologies as for tech_stat 3 technologies in first years
-p_costMarkupAdvTech("4",ttot) = p_costMarkupAdvTech("3",ttot);
-p_costMarkupAdvTech("5",ttot) = p_costMarkupAdvTech("3",ttot);
-
 loop (teNoLearn(te),
   pm_inco0_t(ttot,regi,te) = pm_data(regi,"inco0",te);
   loop (ttot$( ttot.val ge 2005 AND ttot.val lt 2035 ),
     pm_inco0_t(ttot,regi,te)
-    = sum(s_statusTe$( s_statusTe.val eq pm_data(regi,"tech_stat",te) ),
+    = sum(s_statusTe$( s_statusTe.val eq pm_data(regi,"tech_avail",te) ),
         p_costMarkupAdvTech(s_statusTe,ttot)
       * pm_inco0_t(ttot,regi,te)
       );
@@ -505,7 +501,7 @@ $ifthen.REG_techcosts "%cm_techcosts%" == "REG"   !! cm_techcosts REG
     loop (teNoLearn(te)$( sameas(te,"igcc") ),
       loop (ttot$( ttot.val ge 2005 AND ttot.val lt 2035 ),
         pm_inco0_t(ttot,regi,te)
-        = sum(s_statusTe$( s_statusTe.val eq pm_data(regi,"tech_stat",te) ),
+        = sum(s_statusTe$( s_statusTe.val eq pm_data(regi,"tech_avail",te) ),
             p_costMarkupAdvTech(s_statusTe,ttot)
           * pm_inco0_t(ttot,regi,te)
           );

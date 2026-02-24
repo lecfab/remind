@@ -127,7 +127,7 @@ vm_deltaCap.lo(t,regi,"bioh2c","1") $ (t.val <= 2030) = 0;
 
 
 *** ------------------------------------------------------------------
-*' ##### Technologies depending on learning and tech_stat
+*' ##### Technologies depending on learning and tech_avail
 *** ------------------------------------------------------------------
 *** RP 20160126: set vm_costTeCapital to pm_inco0_t for all technologies that are non-learning
 vm_costTeCapital.fx(ttot,regi,teNoLearn) = pm_inco0_t("2005",regi,teNoLearn); !! use 2005 value for the past
@@ -142,18 +142,18 @@ vm_cap.up("2010",regi,teStor,"1") = 0;
 
 *** NR: cumulated capacity never falls below initial cumulated capacity:
 vm_capCum.lo(ttot,regi,teLearn) $ (ttot.val >= cm_startyear) = pm_data(regi,"ccap0",teLearn);
-*** exception for tech_stat 4 technologies whose ccap0 refers to 2025 as these technologies don't exist in 2005
-vm_capCum.lo(ttot,regi,teLearn) $ (pm_data(regi,"tech_stat",teLearn) = 4 and ttot.val <= 2020) = 0;
+*** exception for tech_avail 2025 technologies whose ccap0 refers to 2025 as these technologies don't exist in 2005
+vm_capCum.lo(ttot,regi,teLearn) $ (pm_data(regi,"tech_avail",teLearn) = 2025 and ttot.val <= 2020) = 0;
 
 
 *' Advanced technologies shouldn't be built prior to 2015/2020
 loop(regi,
-  loop(teNoLearn(te) $ (pm_data(regi,"tech_stat",te) = 2),
+  loop(teNoLearn(te) $ (pm_data(regi,"tech_avail",te) = 2015),
     vm_deltaCap.fx("2010",regi,te,rlf) = 0;
     vm_cap.lo("2010",regi,te,rlf) = 0;
     vm_cap.lo("2015",regi,te,rlf) = 0;
   );
-  loop(teNoLearn(te) $ (pm_data(regi,"tech_stat",te) = 3),
+  loop(teNoLearn(te) $ (pm_data(regi,"tech_avail",te) = 2020),
     vm_deltaCap.fx("2010",regi,te,rlf) = 0;
     vm_deltaCap.fx("2015",regi,te,rlf) = 0;
     vm_cap.lo("2010",regi,te,rlf) = 0;
@@ -162,17 +162,17 @@ loop(regi,
   );
 );
 
-*' no technologies with tech_stat 4 before 2025
-vm_cap.fx(t,regi,te,rlf) $ (t.val <= 2020 and pm_data(regi,"tech_stat",te) = 4) = 0;
-*** initialize cumulative capacity of tech_stat 4 technologies at 0 
-*** (not at ccap0 from generisdata_tech.prn which gives the cucmulative capacity
+*' no technologies with tech_avail 2025 before 2025
+vm_cap.fx(t,regi,te,rlf) $ (t.val <= 2020 and pm_data(regi,"tech_avail",te) = 2025) = 0;
+*** initialize cumulative capacity of tech_avail 2025 technologies at 0 
+*** (not at ccap0 from generisdata_tech.prn which gives the cumulative capacity
 ***  at the initial investment cost of the first year in which the technology can be built)
-vm_capCum.fx(t0,regi,teLearn) $ (pm_data(regi,"tech_stat",teLearn) = 4) = 0;
-*** tech_stat 4 technologies don't learn before 2025, so capital cost should be fixed
-vm_costTeCapital.fx(t,regi,teLearn) $ (t.val <= 2020 and pm_data(regi,"tech_stat",teLearn) = 4) = fm_dataglob("inco0",teLearn);
+vm_capCum.fx(t0,regi,teLearn) $ (pm_data(regi,"tech_avail",teLearn) = 2025) = 0;
+*** tech_avail 2025 technologies don't learn before 2025, so capital cost should be fixed
+vm_costTeCapital.fx(t,regi,teLearn) $ (t.val <= 2020 and pm_data(regi,"tech_avail",teLearn) = 2025) = fm_dataglob("inco0",teLearn);
 
-*** no technologies with tech_stat 5 before 2030
-vm_deltaCap.fx(t,regi,te,rlf) $ (t.val <= 2025 and pm_data(regi,"tech_stat",te) = 5) = 0;
+*** no technologies with tech_avail 2030 before 2030
+vm_deltaCap.fx(t,regi,te,rlf) $ (t.val <= 2025 and pm_data(regi,"tech_avail",te) = 2030) = 0;
 
 
 *** ------------------------------------------------------------------
