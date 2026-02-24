@@ -1,6 +1,0 @@
-*** SOF ./core/input/p_costMarkupAdvTech.prn
-*** DEPRECATED: This file is no longer included in the model.
-*** The cost markup is now computed inline in datainput.gms using the formula:
-***   markup(availableYr, t) = max(1, 1 + max(0, availableYr + 10 - t) * 0.06)
-*** This file is kept for reference only.
-*** EOF ./core/input/p_costMarkupAdvTech.prn

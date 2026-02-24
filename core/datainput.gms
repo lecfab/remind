@@ -447,43 +447,32 @@ display pm_data;
 *** end learning parameters
 *** -------------------------------------------------------------------------------
 
-*** Markup for advanced technologies: investment cost premium proportional to years until commercial availability.
-*** markup(availableYr, t) = max(1, 1 + max(0, availableYr + s_markupDecayYrs - t) * s_markupRatePerYr)
-*** markup=1 for mature techs (availableYr=0 or blank), decays linearly to 1.0 s_markupDecayYrs years
-*** after the availability year (e.g. availableYr=2020 reaches markup=1.0 at t=2030 with s_markupDecayYrs=10).
-scalar
-  s_markupDecayYrs  "years after availableYr until cost markup reaches 1.0"  / 10 /
-  s_markupRatePerYr "fractional cost markup increase per year before maturity" / 0.06 /
-;
+*** Initialize investment costs from global data for all non-learning technologies
 loop (teNoLearn(te),
   pm_inco0_t(ttot,regi,te) = pm_data(regi,"inco0",te);
-  pm_inco0_t(ttot,regi,te) $ (ttot.val ge 2005)
-    = pm_inco0_t(ttot,regi,te)
-      * max(1, 1 + max(0, pm_data(regi,"availableYr",te) + s_markupDecayYrs - ttot.val) * s_markupRatePerYr);
 );
-display pm_inco0_t;
 
 *** regional differentiation and convergence of non-learning technologies costs
 $ifthen.REG2040_techcosts "%cm_techcosts%" == "REG2040"   !! cm_techcosts REG2040
 *** for 2015-2040, use differentiated costs when available for a specific non-learning technology
-    loop(te$( teNoLearn(te) AND teRegTechCosts(te) ),
-      pm_inco0_t(ttot,regi,te)$( ttot.val ge 2015 AND ttot.val lt 2045)
+    loop(te $ (teNoLearn(te) and teRegTechCosts(te)),
+      pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2015 and ttot.val < 2045)
       = p_inco0(ttot,regi,te);
 
 *** after 2040, keep the same regionally differentiated costs
-      pm_inco0_t(ttot,regi,te)$( ttot.val gt 2040 ) = p_inco0("2040",regi,te);
+      pm_inco0_t(ttot,regi,te) $ (ttot.val > 2040) = p_inco0("2040",regi,te);
     );
 $endif.REG2040_techcosts
 
 $ifthen.REG_techcosts "%cm_techcosts%" == "REG"   !! cm_techcosts REG
 *** for 2015-2020, use differentiated costs when available for a specific non-learning technology
-    loop(te$( teNoLearn(te) AND teRegTechCosts(te) ),
-      pm_inco0_t(ttot,regi,te)$( ttot.val ge 2015 AND ttot.val lt 2025)
+    loop(te $ (teNoLearn(te) and teRegTechCosts(te)),
+      pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2015 and ttot.val < 2025)
       = p_inco0(ttot,regi,te);
 
 *** from 2025 to c_teNoLearngConvEndYr, apply linear convergence of investment costs so that
 *** all regions converge and stabilise at the technology cost data given in generisdata.prn
-      loop(ttot$( ttot.val ge 2020 AND ttot.val le c_teNoLearngConvEndYr ),
+      loop(ttot $ (ttot.val >= 2020 and ttot.val <= c_teNoLearngConvEndYr),
         pm_inco0_t(ttot,regi,te)
         = (
             (pm_ttot_val(ttot) - 2020) * fm_dataglob("inco0",te)
@@ -492,15 +481,20 @@ $ifthen.REG_techcosts "%cm_techcosts%" == "REG"   !! cm_techcosts REG
           / (c_teNoLearngConvEndYr - 2020);
       );
 
-      pm_inco0_t(ttot,regi,te)$( ttot.val gt c_teNoLearngConvEndYr ) = fm_dataglob("inco0",te);
+      pm_inco0_t(ttot,regi,te) $ (ttot.val > c_teNoLearngConvEndYr) = fm_dataglob("inco0",te);
     );
-
-*** re-insert effect of cost markup for IGCC in the regionalized cost
-*** data, as the IEA numbers have unrealistically low IGCC costs in 2005-2020
-    pm_inco0_t(ttot,regi,"igcc") $ (ttot.val ge 2005 AND ttot.val lt 2035)
-      = pm_inco0_t(ttot,regi,"igcc")
-        * max(1, 1 + max(0, pm_data(regi,"availableYr","igcc") + s_markupDecayYrs - ttot.val) * s_markupRatePerYr);
 $endif.REG_techcosts
+
+*** Apply markup for advanced technologies after regional cost differentiation, so the markup
+*** is consistently applied on top of any cost base (global or regional).
+*** markup(availableYr, t) = max(1, 1 + max(0, availableYr + s_markupDecayYrs - t) * s_markupRatePerYr)
+*** markup=1 for mature techs (availableYr=0), decays linearly to 1.0 s_markupDecayYrs years after availableYr.
+loop (teNoLearn(te),
+  pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2005)
+    = pm_inco0_t(ttot,regi,te)
+      * max(1, 1 + max(0, pm_data(regi,"availableYr",te) + s_markupDecayYrs - ttot.val) * s_markupRatePerYr);
+);
+display pm_inco0_t;
 
 *------------------------------------------------------------------------------------
 ***          Technology data input read-in and manipulation    END

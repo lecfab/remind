@@ -375,7 +375,7 @@ qm_deltaCapCumNet(ttot,regi,teLearn)$(ord(ttot) lt card(ttot) AND pm_ttot_val(tt
 *' Initial values for cumulated capacities (learning technologies only):
 *' (except for technologies not yet available in 2005, whose ccap0 refers to their first availability year)
 ***---------------------------------------------------------------------------
-q_capCumNet(t0,regi,teLearn)$(NOT (pm_data(regi,"availableYr",teLearn) gt 2005))..
+q_capCumNet(t0,regi,teLearn) $ (pm_data(regi,"availableYr",teLearn) <= 2005)..
   vm_capCum(t0,regi,teLearn)
   =e=
   pm_data(regi,"ccap0",teLearn);
@@ -455,7 +455,7 @@ q_limitGeopot(t,regi,peReComp(enty),rlf)..
 *' In equations.gms, the investment costs equation `q_costTeCapital` corresponds to $I = a'\times C^{b'} + F$,
 *' with variations depending on time period and floor cost scenarios.
 
-q_costTeCapital(t,regi,teLearn)$(NOT (t.val lt pm_data(regi,"availableYr",teLearn))) ..
+q_costTeCapital(t,regi,teLearn) $ (t.val >= pm_data(regi,"availableYr",teLearn)) ..
   vm_costTeCapital(t,regi,teLearn)
   =e=
 *** until 2005: using global estimates better matches historic values

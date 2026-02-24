@@ -140,22 +140,18 @@ vm_costTeCapital.lo(t,regi,teLearn) = 0.2 * pm_data(regi,"floorcost",teLearn);
 *' No battery storage in 2010
 vm_cap.up("2010",regi,teStor,"1") = 0;
 
-*** NR: cumulated capacity never falls below initial cumulated capacity:
-vm_capCum.lo(ttot,regi,teLearn) $ (ttot.val >= cm_startyear) = pm_data(regi,"ccap0",teLearn);
-*** technologies not yet available have zero cumulative capacity
-vm_capCum.lo(ttot,regi,teLearn) $ (ttot.val < pm_data(regi,"availableYr",teLearn)) = 0;
-
-*' Technologies cannot be built before they are available
+*' Technologies cannot be built, have no capacity, and do not accumulate learning before their availability year
 vm_deltaCap.fx(t,regi,te,rlf) $ (t.val < pm_data(regi,"availableYr",te)) = 0;
-vm_cap.lo(t,regi,te,rlf) $ (t.val < pm_data(regi,"availableYr",te)) = 0;
+vm_cap.fx(t,regi,te,rlf) $ (t.val < pm_data(regi,"availableYr",te)) = 0;
 
-*** learning technologies: fix capacity to 0 and capital cost at initial value before availability year
-vm_cap.fx(t,regi,teLearn,rlf) $ (t.val < pm_data(regi,"availableYr",teLearn)) = 0;
-*** initialize cumulative capacity at 0 for learning technologies not yet available in 2005
-vm_capCum.fx(t0,regi,teLearn) $ (pm_data(regi,"availableYr",teLearn) gt 2005) = 0;
-*** learning technologies don't learn before they are available, so capital cost should be fixed
-vm_costTeCapital.fx(t,regi,teLearn) $ (t.val lt pm_data(regi,"availableYr",teLearn)) = fm_dataglob("inco0",teLearn);
+*' For learning technologies: fix capital cost at initial value before availability year (no learning before the tech exists)
+*' and initialize cumulative capacity at 0 in t0 (their ccap0 in generisdata_tech.prn refers to their first availability year)
+vm_costTeCapital.fx(t,regi,teLearn) $ (t.val < pm_data(regi,"availableYr",teLearn)) = fm_dataglob("inco0",teLearn);
+vm_capCum.fx(t0,regi,teLearn) $ (pm_data(regi,"availableYr",teLearn) > 2005) = 0;
 
+*' Cumulated capacity never falls below initial cumulated capacity, except before the technology is available
+vm_capCum.lo(ttot,regi,teLearn) $ (ttot.val >= cm_startyear) = pm_data(regi,"ccap0",teLearn);
+vm_capCum.lo(ttot,regi,teLearn) $ (ttot.val < pm_data(regi,"availableYr",teLearn)) = 0;
 
 *** ------------------------------------------------------------------
 *' ##### Capacity for nuclear energy

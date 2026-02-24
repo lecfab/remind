@@ -665,6 +665,10 @@ o_modelstat                  "critical solver status for solution"
 sm_dmac                      "step in MAC functions [US$]"                                                                   
 sm_macChange                 "maximum yearly increase of relative abatement in percentage points of maximum abatement. [0..1]"      /0.05/
 
+*** technology cost markup parameters (used in datainput.gms for pm_inco0_t)
+s_markupDecayYrs             "years after availableYr until investment cost markup reaches 1.0 for advanced technologies [yr]"  /10/
+s_markupRatePerYr            "fractional investment cost markup increase per year before commercial maturity [1/yr]"             /0.06/
+
 s_co2pipe_leakage            "Leakage rate of CO2 pipelines. [0..1]"
 s_tau_cement                 "range of per capita investments for switching from short-term to long-term behavior in CO2 cement emissions"                / 12000 /
 s_c_so2                      "constant, see S. Smith, 2004, Future Sulfur Dioxide Emissions"    /4.39445/
