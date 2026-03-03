@@ -123,9 +123,10 @@ startedRuns <- 0
 waitingRuns <- 0
 modeltestRunsUsed <- 0
 
-nonStoppingError <- function(...) { # error display that increments the global errorsfound counter
+# Displays an error message and increments the global errorsfound counter.
+nonStoppingError <- function(...) {
   message(red, "Error", NC, ": ", ...)
-  errorsfound <<- errorsfound + 1 # operator <<- ensures that the global variable errorsfound is modified
+  errorsfound <<- errorsfound + 1
 }
 
 # Returns TRUE if 'fullname' ends with 'extension' (eg. if "C_SSP2-Base/fulldata.gdx" ends with "fulldata.gdx")
@@ -318,7 +319,7 @@ if (any(c("--reprepare", "--restart") %in% flags)) {
   # Modify and save cfg for all runs
   for (scen in rownames(scenarios)) {
 
-    #source cfg file for each scenario to avoid duplication of gdx entries in files2export
+    # source cfg file for each scenario to avoid duplication of gdx entries in files2export
     cfg <- readDefaultConfig(".")
 
     # Have the log output written in a file (not on the screen)
@@ -576,6 +577,7 @@ if (any(c("--reprepare", "--restart") %in% flags)) {
       errorsfound <- errorsfound + ! gcresult
     } else if (start_now) {
       if (errorsfound == 0) {
+        # set up local calibration folder if not yet present ----
         caldir <- "calibration_results/"
         if (cfg$gms$CES_parameters == "calibrate" && !dir.exists(caldir)) {
           if (0 == system("./scripts/utils/set-local-calibration.sh")) {
