@@ -241,7 +241,7 @@ $endif.c_techAssumptScen
 *** cm_ccsinjeCost cost scenarios
 *** Warning: it applies absolute values; only use it in combination with default c_techAssumptScen SSP2. 
 *** low estimate: ccsinje cost prior to 03/2024; i.e. ~11 USD/tCO2 in 2025, decreasing to ~7.5USD/tCO2 as of 2035
-$if "%cm_ccsinjeCost%" == "low" fm_dataglob("tech_stat","ccsinje") = 2;
+$if "%cm_ccsinjeCost%" == "low" fm_dataglob("availableYr","ccsinje") = 2015;
 $if "%cm_ccsinjeCost%" == "low" fm_dataglob("inco0","ccsinje") = 220;
 $if "%cm_ccsinjeCost%" == "low" fm_dataglob("constrTme","ccsinje") = 0;
 *** high estimate: ~20USD/tCO2 (constant), assuming upper end of storage cost and long transport distances
@@ -434,9 +434,9 @@ $else
 display p_capCum;
 $endif
 
-*FS* initialize learning curve for most advanced technologies as defined by tech_stat = 4 in generisdata_tech.prn (with very small real-world capacities in 2020)
+*FS* Initialise learning curve for technologies not yet deployed in 2020 (availableYr > 2020),
 *** equally for all regions based on global cumulative capacity of ccap0 and incolearn (difference between initial investment cost and floor cost)
-pm_data(regi,"learnMult_wFC",te)$( pm_data(regi,"tech_stat",te) eq 4 )
+pm_data(regi,"learnMult_wFC",te) $ (pm_data(regi,"availableYr",te) > 2020)
   = pm_data(regi,"incolearn",te)
   / ( fm_dataglob("ccap0",te)
    ** pm_data(regi,"learnExp_wFC",te)
@@ -447,48 +447,32 @@ display pm_data;
 *** end learning parameters
 *** -------------------------------------------------------------------------------
 
-*** Markup for advanced technologies
-table p_costMarkupAdvTech(s_statusTe,tall)              "Multiplicative investment cost markup for early time periods (until 2030) on advanced technologies (CCS, Hydrogen) that are not modeled through endogenous learning"
-$include "./core/input/p_costMarkupAdvTech.prn"
-;
-
-*** add mark-up cost for tech_stat 4 and 5 technologies as for tech_stat 3 technologies in first years
-p_costMarkupAdvTech("4",ttot) = p_costMarkupAdvTech("3",ttot);
-p_costMarkupAdvTech("5",ttot) = p_costMarkupAdvTech("3",ttot);
-
+*** Initialise investment costs from global data for all non-learning technologies
 loop (teNoLearn(te),
   pm_inco0_t(ttot,regi,te) = pm_data(regi,"inco0",te);
-  loop (ttot$( ttot.val ge 2005 AND ttot.val lt 2035 ),
-    pm_inco0_t(ttot,regi,te)
-    = sum(s_statusTe$( s_statusTe.val eq pm_data(regi,"tech_stat",te) ),
-        p_costMarkupAdvTech(s_statusTe,ttot)
-      * pm_inco0_t(ttot,regi,te)
-      );
-  );
 );
-display pm_inco0_t;
 
 *** regional differentiation and convergence of non-learning technologies costs
 $ifthen.REG2040_techcosts "%cm_techcosts%" == "REG2040"   !! cm_techcosts REG2040
 *** for 2015-2040, use differentiated costs when available for a specific non-learning technology
-    loop(te$( teNoLearn(te) AND teRegTechCosts(te) ),
-      pm_inco0_t(ttot,regi,te)$( ttot.val ge 2015 AND ttot.val lt 2045)
+    loop(te $ (teNoLearn(te) and teRegTechCosts(te)),
+      pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2015 and ttot.val <= 2040)
       = p_inco0(ttot,regi,te);
 
 *** after 2040, keep the same regionally differentiated costs
-      pm_inco0_t(ttot,regi,te)$( ttot.val gt 2040 ) = p_inco0("2040",regi,te);
+      pm_inco0_t(ttot,regi,te) $ (ttot.val > 2040) = p_inco0("2040",regi,te);
     );
 $endif.REG2040_techcosts
 
 $ifthen.REG_techcosts "%cm_techcosts%" == "REG"   !! cm_techcosts REG
 *** for 2015-2020, use differentiated costs when available for a specific non-learning technology
-    loop(te$( teNoLearn(te) AND teRegTechCosts(te) ),
-      pm_inco0_t(ttot,regi,te)$( ttot.val ge 2015 AND ttot.val lt 2025)
+    loop(te $ (teNoLearn(te) and teRegTechCosts(te)),
+      pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2015 and ttot.val < 2025)
       = p_inco0(ttot,regi,te);
 
 *** from 2025 to c_teNoLearngConvEndYr, apply linear convergence of investment costs so that
 *** all regions converge and stabilise at the technology cost data given in generisdata.prn
-      loop(ttot$( ttot.val ge 2020 AND ttot.val le c_teNoLearngConvEndYr ),
+      loop(ttot $ (ttot.val >= 2020 and ttot.val <= c_teNoLearngConvEndYr),
         pm_inco0_t(ttot,regi,te)
         = (
             (pm_ttot_val(ttot) - 2020) * fm_dataglob("inco0",te)
@@ -497,21 +481,26 @@ $ifthen.REG_techcosts "%cm_techcosts%" == "REG"   !! cm_techcosts REG
           / (c_teNoLearngConvEndYr - 2020);
       );
 
-      pm_inco0_t(ttot,regi,te)$( ttot.val gt c_teNoLearngConvEndYr ) = fm_dataglob("inco0",te);
-    );
-
-*** re-insert effect of costMarkupAdvTech for IGCC in the regionalized cost
-*** data, as the IEA numbers have unrealistically low IGCC costs in 2005-2020
-    loop (teNoLearn(te)$( sameas(te,"igcc") ),
-      loop (ttot$( ttot.val ge 2005 AND ttot.val lt 2035 ),
-        pm_inco0_t(ttot,regi,te)
-        = sum(s_statusTe$( s_statusTe.val eq pm_data(regi,"tech_stat",te) ),
-            p_costMarkupAdvTech(s_statusTe,ttot)
-          * pm_inco0_t(ttot,regi,te)
-          );
-      );
+      pm_inco0_t(ttot,regi,te) $ (ttot.val > c_teNoLearngConvEndYr) = fm_dataglob("inco0",te);
     );
 $endif.REG_techcosts
+
+*** Apply markup for advanced technologies after regional cost differentiation, so the markup
+*** is consistently applied on top of any cost base (global or regional).
+*** Formula: markup(availableYr, t) = max(1, s_markupInitial - (s_markupInitial - 1) * max(0, t - availableYr) / s_markupDecayYrs)
+*** At t=availableYr markup equals s_markupInitial, then decays linearly to 1.0 over s_markupDecayYrs years.
+*** markup=1 for mature techs (availableYr=0) and for t > availableYr + s_markupDecayYrs.
+*** Comparison to old p_costMarkupAdvTech.prn values (tech_stat row, years 2005/2010/2015/2020/2025/2030):
+***   tech_stat=1 (availableYr=2005): old=[1.9, 1.6, 1.3, 1.1, 1.0, 1.0], new=[1.9, 1.6, 1.3, 1.0, 1.0, 1.0]
+***   tech_stat=2 (availableYr=2015): old=[2.0, 2.0, 1.9, 1.6, 1.3, 1.1], new=[1.9, 1.9, 1.9, 1.6, 1.3, 1.0]
+***   tech_stat=3 (availableYr=2020): old=[2.3, 2.3, 2.2, 1.8, 1.5, 1.2], new=[1.9, 1.9, 1.9, 1.9, 1.6, 1.3]
+***   tech_stat=5 (availableYr=2030): old=[2.3, 2.3, 2.2, 1.8, 1.5, 1.2], new=[1.9, 1.9, 1.9, 1.9, 1.9, 1.9]
+loop (teNoLearn(te),
+  pm_inco0_t(ttot,regi,te) $ (ttot.val >= 2005)
+    = pm_inco0_t(ttot,regi,te)
+      * max(1, s_markupInitial - (s_markupInitial - 1) * max(0, ttot.val - pm_data(regi,"availableYr",te)) / s_markupDecayYrs);
+);
+display pm_inco0_t;
 
 *------------------------------------------------------------------------------------
 ***          Technology data input read-in and manipulation    END

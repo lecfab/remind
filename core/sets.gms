@@ -2199,7 +2199,7 @@ char            "characteristics of technologies"
     tkpremused      "turn-key cost premium used in the model (with a discount rate of 3+ pure rate of time preference); in comparison to overnight costs)"
     lifetime        "average lifetime of a technology (integral under the omeg-curve). Unit: years"
     flexibility                        "representing ramping constraints or additional costs for partial load of technologies in power sector"
-    tech_stat       "technology status: how close a technology is to market readiness. Scale: 0-3, with 0 'I can go out and build a GW plant today' to 3 'Still some research necessary'"
+    availableYr     "year when technology is assumed to be commercially available at scale (past years mean the technology is already mature; 0 means available at model start)"
     Xport           "imports"
     Mport           "exports"
     use             "financial trade costs for PE use [trl$US per TWa]"
@@ -2222,10 +2222,6 @@ charPeRe(char) "characteristics of renewables"
 /
     cost       "marginal costs of production"
     maxprod    "maximum annual production"
-/
-s_statusTe   "technology status: how close a technology is to market readiness. Scale: 0-3, with 0 'I can go out and build a GW plant today' to 3 'Still some research necessary'"
-/
-    0 * 5
 /
 ;
 
