@@ -1503,6 +1503,11 @@ $setGlobal cm_emiMktTarget_tolerance  GLO 0.01    !! def = GLO 0.01
 ***   Example on how to use:
 ***     cm_scaleDemand = '2020.2040.(EUR,NEU,USA,JPN,CAZ) 0.75' applies a 25% demand reduction on those regions progressively between 2020 (100% demand) and 2040 (75% demand).
 $setGlobal cm_scaleDemand  off    !! def = off
+*** cm_scaleDemandChem - Rescaling factor on chemicals final energy and usable energy demand, for selected regions and over a phase-in window. This rescaling comes on top of a possible factor in cm_scaleDemand.
+*** Requires re-calibration in order to work.
+***   Example on how to use:
+***     cm_scaleDemandChem = '2020.2040.(EUR,NEU,USA,JPN,CAZ) 0.75' applies a 25% demand reduction on those regions progressively between 2020 (100% demand) and 2040 (75% demand).
+$setGlobal cm_scaleDemandChem  off    !! def = off
 *** cm_quantity_regiCO2target "emissions quantity upper bound from specific year for region group."
 ***   Example on how to use:
 ***     '2050.EUR_regi.netGHG 0.000001, obliges European GHG emissions to be approximately zero from 2050 onward"

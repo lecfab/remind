@@ -14,15 +14,15 @@ calculate_CES_configuration <- function(cfg, path = getwd(), check = FALSE) {
                         if (! cfg$gms$cm_calibration_string == "off") paste0(cfg$gms$cm_calibration_string, "-"),
                         "Reg_", madrat::regionscode(file.path(path, cfg$regionmapping))
     )
-    CESfile <- file.path(path, "./modules/29_CES_parameters/load/input",
-                         paste0(CESstring, ".inc"))
+
+    ######## Check that CES-file name is not too long ########
+    CESfile <- file.path(path, "./modules/29_CES_parameters/load/input", paste0(CESstring, ".inc"))
     if (check && nchar(CESfile) > 255) {
-        stop("Filename of CES file has more than 255 characters, which will ",
-             "cause GAMS to fail on loading it.\n",
+        stop("Filename of CES file has more than 255 characters, which will cause GAMS to fail on loading it.\n",
              "Rename and shorten the path to your REMIND directory by ",
-             (nchar(CESfile) - 255), " characters.\n",
-             "Like so: '",
-             substr(path, 1, nchar(path) - (nchar(CESfile) - 255)), "'")
+             (nchar(CESfile) - 255), " characters, for instance:\n    ",
+             substr(path, 1, nchar(path) - (nchar(CESfile) - 255)))
     }
+
     return(CESstring)
 }
