@@ -137,17 +137,34 @@ vm_costTeCapital.fx(t,   regi,teNoLearn) = pm_inco0_t(t,regi,teNoLearn);
 *** variations of 2015 costs and long-term costs being high in SSP3/SSP5, this can be different -> set lower bound to 0.2
 vm_costTeCapital.lo(t,regi,teLearn) = 0.2 * pm_data(regi,"floorcost",teLearn);
 
+*** #### TODO: bounds that previously applied
+*** vm_capCum.lo(>= cm_startyear,regi,teLearn) = pm_data(regi,"ccap0",teLearn);
+*** 
+*** "tech_stat" 2 (2015) "tech_stat" 3 (2020)
+***   vm_deltaCap.fx(< availYr,regi,teNoLearn,rlf) = 0;
+***   vm_cap.lo(<= availYr,regi,teNoLearn,rlf) = 0;
+***   vm_cap.up(< availYr,regi,teStor,"1") = 0;
+*** 
+*** "tech_stat" 4 (2025)
+***   vm_capCum.fx(t0,regi,teLearn) = 0
+***   vm_cap.fx(< availYr,regi,te,rlf) = 0
+***   vm_capCum.lo(< availYr,regi,teLearn) = 0
+***   vm_costTeCapital.fx(< availYr,regi,teLearn) = fm_dataglob("inco0",teLearn)
+*** "tech_stat" 5 (2030)
+***   vm_deltaCap.fx(< availYr,regi,te,rlf) = 0
+*** ####
+
 *' No battery storage in 2010
 vm_cap.up("2010",regi,teStor,"1") = 0;
 
 *' Technologies cannot be built, have no capacity, and do not accumulate learning before their availability year
 vm_deltaCap.fx(t,regi,te,rlf) $ (t.val < pm_data(regi,"availableYr",te)) = 0;
-vm_cap.fx(t,regi,te,rlf) $ (t.val < pm_data(regi,"availableYr",te)) = 0;
+vm_cap.lo(t,regi,te,rlf) $ (t.val <= pm_data(regi,"availableYr",te)) = 0;
 
 *' For learning technologies: fix capital cost at initial value before availability year (no learning before the tech exists)
-*' and initialize cumulative capacity at 0 in t0 (their ccap0 in generisdata_tech.prn refers to their first availability year)
+*' and initialise cumulative capacity at 0 in t0 (their ccap0 in generisdata_tech.prn refers to their first availability year)
 vm_costTeCapital.fx(t,regi,teLearn) $ (t.val < pm_data(regi,"availableYr",teLearn)) = fm_dataglob("inco0",teLearn);
-vm_capCum.fx(t0,regi,teLearn) $ (pm_data(regi,"availableYr",teLearn) > 2005) = 0;
+vm_capCum.fx(t0,regi,teLearn) $ (pm_data(regi,"availableYr",teLearn) > t0.val) = 0;
 
 *' Cumulated capacity never falls below initial cumulated capacity, except before the technology is available
 vm_capCum.lo(ttot,regi,teLearn) $ (ttot.val >= cm_startyear) = pm_data(regi,"ccap0",teLearn);
