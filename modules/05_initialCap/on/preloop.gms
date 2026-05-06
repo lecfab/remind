@@ -226,20 +226,16 @@ display vm_deltaCap.l;
 ***           Calculate the lower bounds on capacities in 2010-2025  Start
 ***---------------------------------------------------------------------------
 
-p05_aux_calccapLowerLimitSwitch(ttot)$(ttot.val < 2010) = 1;
-p05_aux_calccapLowerLimitSwitch(ttot)$(ttot.val > 2005) = 0;
-loop( ttot$( ( ttot.val > 2000 ) AND ( ttot.val < 2030 ) ),
-  pm_aux_capLowerLimit(te,regi,ttot) =
+p05_aux_calccapLowerLimitSwitch(ttot) $ (ttot.val <= 2005) = 1;
+p05_aux_calccapLowerLimitSwitch(ttot) $ (ttot.val >= 2010) = 0;
 ***cb early retirement for some fossil technologies
 *RP* assume no ER         (1 - vm_capEarlyReti(ttot,regi,te)) *
-  (sum(opTimeYr2te(te,opTimeYr)$(tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val ge 1) ),
-                    pm_ts(ttot-(pm_tsu2opTimeYr(ttot,opTimeYr)-1))
-                  * pm_omeg(regi,opTimeYr+1,te)
-                  * vm_deltaCap.l(ttot-(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,te,"1") * p05_aux_calccapLowerLimitSwitch(ttot-(pm_tsu2opTimeYr(ttot,opTimeYr)-1))
-              )
-  )
-  ;
-);
+pm_aux_capLowerLimit(te,regi,ttot) $ (ttot.val >= 2005 and ttot.val <= 2025) =
+  sum(opTimeYr2te(te,opTimeYr) $ (tsu2opTimeYr(ttot,opTimeYr) and opTimeYr.val >= 1),
+      pm_ts(ttot - (pm_tsu2opTimeYr(ttot,opTimeYr)-1))
+    * pm_omeg(regi,opTimeYr+1,te)
+    * vm_deltaCap.l(ttot - (pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,te,"1") * p05_aux_calccapLowerLimitSwitch(ttot - (pm_tsu2opTimeYr(ttot,opTimeYr)-1))
+  );
 option pm_aux_capLowerLimit:5:1:1;
 display pm_aux_capLowerLimit;
 

@@ -1584,12 +1584,14 @@ $setGlobal cm_dispatchSetyDown  off   !! def = off  The amount that te producing
 *** Share is faded in from cm_startyear or 2020 to the denoted level by region/year.
 *** Example: "2040.EUR 0.6" will cap the share of secondary steel production at 60 % in EUR from 2040 onwards
 $setGlobal cm_dispatchSeelDown  off   !! def = off  The amount that te producing seel can dispatch less (in percent) (overrides cm_dispatchSetyDown for te producing seel)
+
 *' *   cm_NucRegiPol "enable European region specific nuclear phase-out and new capacitiy constraints"
 $setGlobal cm_NucRegiPol   on   !! def = on
-*' *  cm_CoalRegiPol "enable European region specific coal phase-out and new capacitiy constraints"
-$setGlobal cm_CoalRegiPol   on   !! def = on
 *' *  cm_proNucRegiPol "enable European region specific pro nuclear capacitiy constraints"
 $setGlobal cm_proNucRegiPol   off   !! def = off
+
+*' *  cm_CoalRegiPol "enable European region specific coal phase-out and new capacitiy constraints"
+$setGlobal cm_CoalRegiPol   on   !! def = on
 *** cm_CCSRegiPol - year for earliest investment in Europe, with one timestep split between countries currently exploring - Norway (NEN), Netherlands (EWN) and UK (UKI) - and others
 $setGlobal cm_CCSRegiPol     off   !! def = off
 *** cm_vehiclesSubsidies - If "on" applies country specific BEV and FCEV subsidies from 2020 onwards
