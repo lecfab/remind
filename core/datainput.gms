@@ -1668,10 +1668,24 @@ $endif.cm_rcp_scen_build
 *** Scale FE demand across industry and building sectors
 $ifthen.scaleDemand not "%cm_scaleDemand%" == "off"
   loop((tall,tall2,all_regi) $ pm_scaleDemand(tall,tall2,all_regi),
-*FL*  rescaled demand                = normal demand                  * [ scaling factor                      + (1-scaling factor)                      * remaining phase-in, between zero and one               ]
-      pm_fedemand(t,all_regi,all_in) = pm_fedemand(t,all_regi,all_in) * ( pm_scaleDemand(tall,tall2,all_regi) + (1-pm_scaleDemand(tall,tall2,all_regi)) * min(1, max(0, tall2.val-t.val) / (tall2.val-tall.val)) );
+    pm_fedemand(t,all_regi,all_in) = pm_fedemand(t,all_regi,all_in) * (
+*** rescaled demand                = normal demand *
+*** [ scaling factor                      + (1-scaling factor)                      * remaining phase-in, between zero and one ]
+      pm_scaleDemand(tall,tall2,all_regi) + (1-pm_scaleDemand(tall,tall2,all_regi)) * min(1, max(0, tall2.val-t.val) / (tall2.val-tall.val))
+    );
   );
 $endif.scaleDemand
+
+*** Scale FE and UE demand for chemicals
+$ifthen.scaleDemandChem not "%cm_scaleDemandChem%" == "off"
+  loop((tall,tall2,all_regi) $ pm_scaleDemandChem(tall,tall2,all_regi),
+    pm_fedemand(t,all_regi,all_in) $ secInd37_2_pf("chemicals",all_in) = pm_fedemand(t,all_regi,all_in) * (
+*** rescaled demand                                                    = normal demand *
+*** [ scaling factor                          + (1-scaling factor)                          * remaining phase-in, between zero and one ]
+      pm_scaleDemandChem(tall,tall2,all_regi) + (1-pm_scaleDemandChem(tall,tall2,all_regi)) * min(1, max(0, tall2.val-t.val) / (tall2.val-tall.val))
+    );
+  );
+$endif.scaleDemandChem
 
 *** Scale FE demand in building sectors
 $ifthen.scaleDemandBuildTable not "%cm_scaleDemandBuildTable%" == "off"
