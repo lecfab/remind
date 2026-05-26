@@ -1586,6 +1586,11 @@ $setGlobal cm_emiMktTarget_tolerance  GLO 0.01    !! def = GLO 0.01
 ***   Example on how to use:
 ***     cm_scaleDemand = '2020.2040.(EUR,NEU,USA,JPN,CAZ) 0.75' applies a 25% demand reduction on those regions progressively between 2020 (100% demand) and 2040 (75% demand).
 $setGlobal cm_scaleDemand  off    !! def = off
+*** cm_scaleDemandChem - Rescaling factor on chemicals final energy and usable energy demand, for selected regions and over a phase-in window.
+*** Requires re-calibration in order to work.
+***   Example on how to use:
+***     cm_scaleDemandChem = '2020.2040.(EUR,NEU,USA,JPN,CAZ) 0.75' applies a 25% demand reduction on those regions progressively between 2020 (100% demand) and 2040 (75% demand).
+$setGlobal cm_scaleDemandChem  off    !! def = off
 *** cm_scaleDemandBuildTable - Rescaling factor on buildings final energy and usable energy demand, with values coming from an input table.
 *** Requires re-calibration in order to work.
 *** One needs to name the cs4r-file with the multipliers in the scenario_config, and the file needs to be copied by hand to core/input
