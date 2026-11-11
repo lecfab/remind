@@ -5,9 +5,6 @@
 *** |  REMIND License Exception, version 1.0 (see LICENSE file).
 *** |  Contact: remind@pik-potsdam.de
 *** SOF ./modules/80_optimization/nashOneRegi/output.gms
-*LB*AJS* unlike nash, nashOneRegi takes pm_pvp from path_gdx and never updates it, so there is no
-*** fallback price path to maintain here (see preloop.gms: an implausible/missing pm_pvp from
-*** path_gdx aborts the run rather than falling back to a generic price path).
 
 *AJS* Write out debug info on price paths and surpluses for all iterations.
 *** The file is formated in columns as follows: | Experiment title | Region | Year | Iteration | Market | surplus | price |  ..

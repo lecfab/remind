@@ -26,17 +26,14 @@ p80_repy(all_regi,"solvestat")$(NOT regi_dyn80(all_regi)) = 1;
 
 *AJS* initialize starting points for prices, trade volumes etc. from gdx.
 ***in order to read parameters like p80_priceXXX from a gdx, instead of only variables , we have to explicitly instruct gams to do so in the execute_loadpoint command in core/preloop.gms.
-*LB*AJS* unlike nash, nashOneRegi has no cold-start case: path_gdx must be an already converged
-*** full-world nash run, so plausible trade prices must be present in it. Rather than silently
-*** falling back to a generic price path (which would no longer match that reference world),
-*** abort loudly so a wrong/non-converged path_gdx is caught immediately.
+*** Unlike nash, nashOneRegi has no cold-start case: path_gdx must be an already converged
+*** global nash run, so plausible trade prices must be present in it. Abort otherwise.
 loop(ttot$(ttot.val ge 2005),
     loop(trade$(NOT tradeSe(trade)),
         if((pm_pvp(ttot,trade) eq NA) OR (pm_pvp(ttot,trade) lt 1E-12) OR (pm_pvp(ttot,trade) gt 0.1) ,
-            display "nashOneRegi: implausible or missing pm_pvp loaded from path_gdx for (ttot,trade):";
-            display ttot.tl, trade.tl, pm_pvp(ttot,trade);
+            put_utility "msg" / "nashOneRegi: implausible or missing pm_pvp loaded from path_gdx for ttot=" ttot.tl:0:0 " trade=" trade.tl:0:0 " value=" pm_pvp(ttot,trade):12:8;
             execute_unload "abort.gdx";
-            abort "nashOneRegi requires plausible trade prices (pm_pvp) already present in path_gdx. Check that path_gdx points to an already converged full-world nash run.";
+            abort "nashOneRegi requires plausible trade prices (pm_pvp) already present in path_gdx. Check that path_gdx points to an already converged global nash run.";
          );
         loop(regi,
          pm_Xport0(ttot,regi,trade)  = vm_Xport.l(ttot,regi,trade);
