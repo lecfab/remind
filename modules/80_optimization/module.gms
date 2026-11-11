@@ -17,5 +17,6 @@
 $Ifi "%optimization%" == "nash" $include "./modules/80_optimization/nash/realization.gms"
 $Ifi "%optimization%" == "negishi" $include "./modules/80_optimization/negishi/realization.gms"
 $Ifi "%optimization%" == "testOneRegi" $include "./modules/80_optimization/testOneRegi/realization.gms"
+$Ifi "%optimization%" == "nashOneRegi" $include "./modules/80_optimization/nashOneRegi/realization.gms"
 *###################### R SECTION END (MODULETYPES) ############################
 *** EOF ./modules/80_optimization/module.gms

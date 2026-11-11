@@ -458,6 +458,9 @@ $setglobal water  heat                 !! def = heat
 *'---------------------    80_optimization    ----------------------------------
 *'
 *' * (nash): Nash solution. Adjust cm_nash_autoconverge to needs.
+*' * (nashOneRegi): like nash, but only solves region(s) in c_testOneRegi_region.
+*'      Other regions, global prices (pm_pvp) and carbon-price anchor are fixed to the path_gdx.
+*'      Intended for studies on a region assumed too small to move global prices/budget.
 *' * (negishi): calculates a Negishi solution (social planner)
 *' * (testOneRegi):  solves the problem for one region for given prices (taken from gdx).
 *'                 ! Warning:  For development purposes only !
@@ -479,7 +482,7 @@ parameter
 *' *  (2): parallel  - all regions are run in parallel
 *'
 parameter
-  cm_iteration_max          "number of iterations, if optimization is set to negishi or testOneRegi; is overwritten in Nash mode, except if cm_nash_autoconverge is set to 0"
+  cm_iteration_max "number of iterations, if optimization is set to negishi or testOneRegi; is overwritten in Nash and nashOneRegi mode, except if cm_nash_autoconverge is set to 0"
 ;
   cm_iteration_max       = 1;     !! def = 1
 *'
@@ -2137,8 +2140,11 @@ $setGlobal cm_APscen  SMIPbySSP          !! def = SMIPbySSP !! regexp = CLE|SLE|
 $setglobal cm_CES_configuration  indu_subsectors-buil_simple-tran_edge_esm-GDPpop_SSP2-En_SSP2-Kap_debt_limit-Reg_62eff8f7   !! this will be changed by start_run()
 $setglobal c_CES_calibration_iterations  10     !!  def  =  10
 $setglobal c_CES_calibration_industry_FE_target  1
-*' setting which region is to be tested in the one-region test run (80_optimization = testOneRegi)
-$setglobal c_testOneRegi_region  EUR       !! def = EUR  !! regexp = [A-Z]{3}
+
+*' Define the selected region for single-region optimisation [80_optimization].
+*' - testOneRegi: define which region is to be tested (eg. "CHA")
+*' - nashOneRegi: define which region(s) are solved against an otherwise frozen world (eg. "FRA, DEU")
+$setglobal c_testOneRegi_region  EUR       !! def = EUR  !! regexp = [A-Z]{3}(\s*,\s*[A-Z]{3})*
 *' cm_taxrc_RE     "switch to define whether tax on (CO2 content of) energy imports is recycled to additional direct investments in renewables (wind, solar and storage)"
 $setglobal cm_taxrc_RE  none   !! def = none   !! regexp = none|REdirect
 *' cm_emifacs_baseyear "base year for deriving nonCO2 emission factors/econometric estimates/scaling factors"
