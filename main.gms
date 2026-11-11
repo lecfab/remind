@@ -532,11 +532,10 @@ parameter
   cm_emiscen        = 9;               !! def = 9  !!  regexp = 0|1|4|6|9|10
 *' *  (0): no global budget. Policy may still be prescribed by 41_emicaprei module.
 *' *  (1): BAU
-*' *  (4): emission time path
+*' *  (4): emission time path. WARNING: data for cm_emiscen 4 only exists for cm_multigasscen 2 bau scenarios and for cm_multigasscen 1
 *' *  (6): budget
 *' *  (9): tax scenario (requires running module 21_tax "on"), tax level controlled by module 45_carbonprice, other GHG etc. controlled by cm_rcp_scen
 *' *  (10): used for cost-benefit analysis
-*' *JeS* WARNING: data for cm_emiscen 4 only exists for cm_multigasscen 2 bau scenarios and for cm_multigasscen 1
 parameter
   cm_taxCO2_startyear    "level of co2 tax in start year in $ per t CO2eq"
 ;
@@ -1428,11 +1427,14 @@ $setglobal cm_NDC_targetYear  2030, 2035    !! def = "2030, 2035"
 *' Instead, regions go "as close as still plausible" to their NDC targets. 
 *' * Examples on how to use:
 *' *  "2030.EUR 150" means that EUR has maximum CO2 price of 150 USD/tCO2 in 2030. 
-*' *  The CO2 price limit is increased after the specified target year by 20%/yr. 
-*' *  In the example, that would mean that EUR has a CO2 price limit in 2035 of 150 + 0.2 * 150 * 5 = 300 USD/tCO2. 
+*' *  For the development after the target year, the switch cm_NDC_CO2PriceLimit_continuation determines whether or not an upper limit on CO2 prices is imposed.
 *' *  By default 2030 CO2 prices are limited to 150 USD/tCO2 in EUR, 80 USD/tCO2 in CAZ, USA, JPN and NEU, 50 USD/tCO2 in REF and MEA, 40 USD/tCO2 in LAM and CHA, 30 USD/tCO2 in OAS, 15 USD/tCO2 in IND and 10 USD/tCO2 in SSA.
 *' *  If set to "off", no CO2 price limits are applied in any region.
 $setglobal cm_NDC_CO2PriceLimit  2030.EUR 150, 2030.(CAZ,USA, JPN, NEU) 80, 2030.(REF,MEA) 50, 2030.(LAM, CHA) 40, 2030.OAS 30, 2030.IND 15, 2030.SSA 10    !! def = "2030.EUR 150, 2030.(CAZ,USA, JPN, NEU) 80, 2030.(REF,MEA) 50, 2030.(LAM, CHA) 40, 2030.OAS 30, 2030.IND 15, 2030.SSA 10" 
+*' cm_NDC_CO2PriceLimit_continuation "switch to determine whether CO2 price limits in NDC realization are applied only in the specified target year or also in subsequent years" [requires 45_carbonprice = NDC]
+*' *  (on): CO2 price limits are applied not only in the specified target year but also in subsequent years, with the limit increasing by 20% per year after the target year, but allowing for carbon price of at least 200$/tCO2 at minimum
+*' *  (off): CO2 price limits are only applied in the specified target year, but not in subsequent years
+$setglobal cm_NDC_CO2PriceLimit_continuation  off     !! def = "off"  !! regexp = on|off
 *' cm_NDC_postTargetDevelopment            "choose assumption on co2 price trajectory after NDC target years" [requires 45_carbonprice = NDC]
 *' *  (constant):                     carbon price remains constant after the last NDC target year
 *' *  (global_conv):                  carbon price converges across regions to a global value of 100$/tCO2 by 2100
@@ -1587,12 +1589,18 @@ $setGlobal cm_dispatchSetyDown  off   !! def = off  The amount that te producing
 *** Share is faded in from cm_startyear or 2020 to the denoted level by region/year.
 *** Example: "2040.EUR 0.6" will cap the share of secondary steel production at 60 % in EUR from 2040 onwards
 $setGlobal cm_dispatchSeelDown  off   !! def = off  The amount that te producing seel can dispatch less (in percent) (overrides cm_dispatchSetyDown for te producing seel)
+
 *' *   cm_NucRegiPol "enable European region specific nuclear phase-out and new capacitiy constraints"
 $setGlobal cm_NucRegiPol   on   !! def = on
-*' *  cm_CoalRegiPol "enable European region specific coal phase-out and new capacitiy constraints"
-$setGlobal cm_CoalRegiPol   on   !! def = on
 *' *  cm_proNucRegiPol "enable European region specific pro nuclear capacitiy constraints"
 $setGlobal cm_proNucRegiPol   off   !! def = off
+*' *  cm_FRA_GWnuc2050 "nuclear capacity [GW] in FRA in 2050 (off lets the model decide, which means slowly phasing out as existing plants retire)"
+$setGlobal cm_FRA_GWnuc2050   off   !! def = off
+*' *  cm_FRAfossil "pledged fossil phase-out: coal 2030, oil 2045, gas 2050"
+$setGlobal cm_FRA_fossilPhaseout   off   !! def = off
+
+*' *  cm_CoalRegiPol "enable European region specific coal phase-out and new capacitiy constraints"
+$setGlobal cm_CoalRegiPol   on   !! def = on
 *** cm_CCSRegiPol - year for earliest investment in Europe, with one timestep split between countries currently exploring - Norway (NEN), Netherlands (EWN) and UK (UKI) - and others
 $setGlobal cm_CCSRegiPol     off   !! def = off
 *** cm_vehiclesSubsidies - If "on" applies country specific BEV and FCEV subsidies from 2020 onwards

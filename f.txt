@@ -1,0 +1,89 @@
+# Color code: [33mpending[39m/[33mstartup[39m, [36mrunning[39m, [32mconverged[39m/[32mfinished[39m, [38;5;214mno mif[39m, [35mconopt stalled?[39m, [38;5;202merror[39m.
+
+[4mFolder                                    Runtime      inSlurm   RunType      RunStatus          Warnings   Iter              Conv                   modelstat              Mif     AppResults[24m 
+[32mfra-Pk750-Fx-Nx_2026-05-08_01.54.00       10.5 hours   no        nash         Normal completion  38         100/100           converged (had INFES)  2: Locally Optimal     sumErr  yes
+[39m[32mfra-Pk750-Fx-N63_2026-05-08_01.54.53      8.3 hours    no        nash         Normal completion  38         72/100            converged              2: Locally Optimal     sumErr  yes
+[39m[38;5;202mfra-Pk750-F0-N90_2026-05-08_01.56.40      11.2 hours   no        nash         Normal completion  38         100/100           not_converged          2: Locally Optimal     sumErr  yes
+[39m[38;5;202mfra-Pk750-F0-N63_2026-05-08_01.56.20      10.9 hours   no        nash         Normal completion  38         100/100           not_converged          2: Locally Optimal     sumErr  yes
+[39m[38;5;202mfra-Pk750-F0-N30_2026-05-08_01.55.59      10.8 hours   no        nash         Normal completion  38         100/100           not_converged          2: Locally Optimal     sumErr  yes
+[39m[38;5;202mfra-Pk750-F0-N4_2026-05-08_01.55.42       10.9 hours   no        nash         Normal completion  38         100/100           not_converged          2: Locally Optimal     sumErr  yes
+[39m[38;5;202mfra-Pk750-F0-Nx_2026-05-08_01.55.26       10.4 hours   no        nash         Normal completion  38         100/100           not_converged          2: Locally Optimal     sumErr  yes
+[39m[38;5;202mfra-Pk750-Fx-N90_2026-05-08_01.55.09      10.8 hours   no        nash         Normal completion  38         100/100           not_converged          2: Locally Optimal     sumErr  yes
+[39m[38;5;202mfra-Pk750-Fx-N4_2026-05-08_01.54.20       10.7 hours   no        nash         Normal completion  38         100/100           not_converged          2: Locally Optimal     sumErr  yes
+[39m[32mfra-Pk750-Fx-N30_2026-05-08_01.54.36      9.4 hours    no        nash         Normal completion  38         88/100            converged (had INFES)  2: Locally Optimal     sumErr  yes
+[39m[38;5;202mfra-Pk750-F0-N90_2026-05-08_01.47.30      NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-F0-N63_2026-05-08_01.47.13      NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-F0-N30_2026-05-08_01.46.57      NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-F0-N4_2026-05-08_01.46.40       NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-F0-Nx_2026-05-08_01.46.24       NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-N90_2026-05-08_01.46.08      NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-N63_2026-05-08_01.45.52      NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-N30_2026-05-08_01.45.36      NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-N4_2026-05-08_01.45.19       NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-Nx_2026-05-08_01.44.59       NA           no        nash         full.log missing   NA         NA                NA                     NA                     no      no
+[39m[32mfra-Pk750-Fx-N90_2026-05-08_00.46.59      8.5 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-Fx-N63_2026-05-08_00.46.42      3.9 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-Fx-N30_2026-05-08_00.46.26      5.9 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-Fx-Nx_2026-05-08_00.45.50       4.1 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-Fx-N4_2026-05-08_00.46.10       3.6 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-F0-N90_2026-05-08_01.02.43      12 mins      no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-F0-Nx_2026-05-08_01.01.33       14.8 mins    no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-F0-N63_2026-05-08_01.02.26      15.8 mins    no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-F0-N4_2026-05-08_01.01.53       15.6 mins    no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-F0-N30_2026-05-08_01.02.09      17 mins      no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-F0-N30_2026-05-07_23.57.52      17.2 mins    no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[38;5;202mfra-Pk750-F0-N63_2026-05-07_23.58.09      15.7 mins    no        1Regi FRA    Normal completion  0          1/1               NA                     7: Intermed Nonoptima  no      no
+[39m[32mfra-Pk750-F0-N90_2026-05-07_23.58.26      10.9 mins    no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-F0-Nx_2026-05-07_23.57.14       11.2 mins    no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[38;5;202mfra-Pk750-F0-N4_2026-05-07_23.57.35       2.2 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[38;5;202mfra-Pk750-Fx-N4_2026-05-07_23.51.54       1.8 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[38;5;202mfra-Pk750-F0-N90_2026-05-07_20.27.54      2 mins       no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[38;5;202mfra-Pk750-F0-N90_2026-05-07_21.48.42      2 mins       no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[38;5;202mfra-Pk750-F0-N63_2026-05-07_21.48.25      2 mins       no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[38;5;202mfra-Pk750-F0-N30_2026-05-07_21.48.09      1.9 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[38;5;202mfra-Pk750-F0-N3_2026-05-07_21.47.52       1.9 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[32mfra-Pk750-Fx-N90_2026-05-07_21.47.19      5.2 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-Fx-N63_2026-05-07_21.47.02      4.9 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[32mfra-Pk750-Fx-N30_2026-05-07_21.46.46      4.2 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[38;5;202mfra-Pk750-F0-Nx_2026-05-07_21.47.36       1.9 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[38;5;202mfra-Pk750-Fx-N3_2026-05-07_21.46.25       1.8 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[32mfra-Pk750-Fx-N90_2026-05-07_21.32.53      5.2 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[38;5;202mfra-Pk750-F0-Nx_2026-05-07_21.33.14       1.9 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[38;5;202mfra-Pk750-Fx-N90_2026-05-07_20.26.32      1.8 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     4: Infeasible          no      no
+[39m[38;5;202mfra-Pk750-F0-Nx_2026-05-07_20.26.49       2.1 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     5: Locally Infes       no      no
+[39m[38;5;202mfra-Pk750-F0-N63_2026-05-07_20.27.38      1.8 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     4: Infeasible          no      no
+[39m[38;5;202mfra-Pk750-F0-N30_2026-05-07_20.27.21      1.8 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     4: Infeasible          no      no
+[39m[38;5;202mfra-Pk750-F0-N3_2026-05-07_20.27.05       1.8 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     4: Infeasible          no      no
+[39m[38;5;202mfra-Pk750-Fx-N63_2026-05-07_20.26.16      1.8 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     4: Infeasible          no      no
+[39m[32mfra-Pk750-Fx-Nx_2026-05-07_20.25.23       6 mins       no        1Regi FRA    Normal completion  0          1/1               NA                     2: Locally Optimal     no      no
+[39m[38;5;202mfra-Pk750-Fx-N30_2026-05-07_20.25.59      1.8 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     4: Infeasible          no      no
+[39m[38;5;202mfra-Pk750-Fx-N3_2026-05-07_20.25.43       1.8 mins     no        1Regi FRA    Normal completion  0          1/1               NA                     4: Infeasible          no      no
+[39m[38;5;202mfra-Pk750-F0-N63_2026-05-07_20.18.14      NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-F0-N30_2026-05-07_20.17.57      NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-F0-N3_2026-05-07_20.17.40       NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-F0-N90_2026-05-07_20.18.31      NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-N90_2026-05-07_20.17.07      NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-F0-Nx_2026-05-07_20.17.24       NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-N63_2026-05-07_20.16.50      NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-N30_2026-05-07_20.16.33      NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-N3_2026-05-07_20.16.17       NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750-Fx-Nx_2026-05-07_20.15.56       NA           no        1Regi FRA    NA                 0          NA/1              NA                     NA                     no      no
+[39m./output/gamscompile skipped.
+[38;5;202mSSP2-EU21-PkBudg650_2026-05-06_06.14.14   12.1 hours   no        nash         Normal completion  38         100/100           not_converged          2: Locally Optimal     sumErr  yes
+[39m[32mfra-Pk1000_2026-05-06_06.15.02            4.9 hours    no        nash         Normal completion  38         39/100            converged              2: Locally Optimal     sumErr  yes
+[39m[32mfra-Pk650_2026-05-06_06.14.43             9.8 hours    no        nash         Normal completion  38         78/100            converged              2: Locally Optimal     sumErr  yes
+[39m[32mfra-Pk750_2026-05-06_06.14.53             8.1 hours    no        nash         Normal completion  38         61/100            converged (had INFES)  2: Locally Optimal     sumErr  yes
+[39m[32mSSP2-EU21-PkBudg750_2026-05-06_06.14.24   7.5 hours    no        nash         Normal completion  38         54/100            converged              2: Locally Optimal     sumErr  yes
+[39m[32mSSP2-EU21-PkBudg1000_2026-05-06_06.14.33  5.2 hours    no        nash         Normal completion  38         41/100            converged              2: Locally Optimal     sumErr  yes
+[39m[32mfra-Npi_2026-05-06_02.13.27               3.4 hours    no        nash         Normal completion  42         32/100            converged              2: Locally Optimal     sumErr  yes
+[39m[32mfra-Pk650_2026-05-05_22.54.47             7.9 hours    no        nash         Normal completion  11         53/100            converged (had INFES)  2: Locally Optimal     sumErr  yes
+[39m[32mSSP2-EU21-PkBudg650_2026-05-05_22.20.26   8.7 hours    no        nash         Normal completion  11         62/100            converged (had INFES)  2: Locally Optimal     sumErr  yes
+[39m[32mSSP2-EU21-NPi2025_2026-05-06_02.13.00     3.7 hours    no        nash         Normal completion  48         38/100            converged              2: Locally Optimal     sumErr  yes
+[39m[32mSSP2-EU21-PkBudg750_2026-05-05_22.20.35   7.6 hours    no        nash         Normal completion  12         52/100            converged (had INFES)  2: Locally Optimal     sumErr  yes
+[39m[32mSSP2-EU21-PkBudg1000_2026-05-05_22.20.45  4.8 hours    no        nash         Normal completion  11         37/100            converged              2: Locally Optimal     sumErr  yes
+[39m[38;5;202mfra-Pk1000_2026-05-05_22.55.06            NA           no        nash         full.log missing   0          NA                NA                     NA                     no      no
+[39m[38;5;202mfra-Pk750_2026-05-05_22.54.57             NA           no        nash         full.log missing   0          NA                NA                     NA                     no      no
+[39m[32mfra-Npi_2026-05-05_20.00.25               5.7 hours    no        nash         Normal completion  14         52/100            converged              2: Locally Optimal     sumErr  yes
+[39m[32mSSP2-EU21-NPi2025_2026-05-05_19.59.56     2.9 hours    no        nash         Normal completion  17         26/100            converged              2: Locally Optimal     sumErr  yes
+[39m[32mSSP2-EU21-NPi2025_2026-05-05_19.42.25     2.6 hours    no        nash         Normal completion  17         23/100            converged              2: Locally Optimal     sumErr  yes
+[39m
