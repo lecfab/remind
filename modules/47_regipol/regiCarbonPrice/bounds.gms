@@ -202,8 +202,7 @@ $IFTHEN.NucRegiPol not "%cm_NucRegiPol%" == "off"
     vm_cap.lo(t,regi,"tnrs","1") $ (t.val ge 2025 and sameas(regi,"DEU")) = 0;
 *' ESC -> no new Nuclear capacity (Italy had a plebiscite for this and Greece should not have any new capacity)
     vm_deltaCap.up(t,regi,"tnrs","1") $ (t.val ge 2020 and sameas(regi,"ESC")) = 0;
-*' Neither France, ENC, NEN, ECS, ESW or ECE currently plan to early-retire any of their current fleet until 2050
-    vm_capEarlyReti.up(t,regi,"tnrs") $ (t.val le 2050 and sameas(regi,"FRA")) = 1e-3;
+*' Neither ENC, NEN, ECS, ESW or ECE currently plan to early-retire any of their current fleet until 2050
     vm_capEarlyReti.up(t,regi,"tnrs") $ (t.val le 2050 and sameas(regi,"ENC")) = 1e-3;
     vm_capEarlyReti.up(t,regi,"tnrs") $ (t.val le 2050 and sameas(regi,"NEN")) = 1e-3;
     vm_capEarlyReti.up(t,regi,"tnrs") $ (t.val le 2050 and sameas(regi,"ECS")) = 1e-3;
@@ -221,7 +220,9 @@ $IFTHEN.proNucRegiPol not "%cm_proNucRegiPol%" == "off"
     vm_cap.lo(t,regi,"tnrs","1") $ (t.val >= 2030 and sameas(regi,"ENC")) = 0.216 * pm_NuclearConstraint("2015",regi,"tnrs");
 *' Assuming Romania would keep at least its 2015 nuclear capacity in the future (ROU corresponds to 22.1% of nuclear capacity of ECS in 2015)
     vm_cap.lo(t,regi,"tnrs","1") $ (t.val >= 2030 and sameas(regi,"ECS")) = 0.221 * pm_NuclearConstraint("2015",regi,"tnrs");
-$ENDIF.proNucRegiPol 
+$ENDIF.proNucRegiPol
+
+
 
 *' This accounts for different CCS policies that can be chosen for the EU subregions.
 $IFTHEN.CCSinvestment not "%cm_CCSRegiPol%" == "off" 
@@ -299,6 +300,58 @@ vm_capFac.fx("2030",regi,"coalchp") = 0.35;
 
 );
 $endif.chaCoalBounds
+
+
+*' ##### Bounds for France
+loop(regi $ sameas(regi, "FRA"),
+*** 2025 values
+*** Renewables at the end of 2025: data from https://analysesetdonnees.rte-france.com/en/generation/global
+    vm_cap.fx("2025",regi,"spv","1") = 0.0304;
+    vm_cap.fx("2025",regi,"windon","1") = 0.0239;
+    vm_cap.fx("2025",regi,"windoff","1") = 0.0019;
+
+$ifthen.cm_FRA_fossilPhaseout not "%cm_FRA_fossilPhaseout%" == "off"
+*** The third edition of the SNBC objectives are to strengthen sovereignty and to transition away from fossil fuels.
+*** It sets end-of-consumption targets for coal by 2030, oil by 2045 and fossil gas by 2050 for energy purposes.
+    v47_prodSEtotal.up(t,regi,"pecoal","sesofos") $ (t.val >= 2030) = 1e-4; !! 2025 FRA: 0.00276177455908108
+    v47_prodSEtotal.up(t,regi,"pecoal","seel")    $ (t.val >= 2030) = 1e-6; !! 2025 FRA: 1.07E-6
+
+    v47_prodSEtotal.up(t,regi,"peoil","seliqfos") $ (t.val >= 2045) = 1e-6; !! 2025 FRA:  0.0837729923780199
+    v47_prodSEtotal.up(t,regi,"peoil","seel")     $ (t.val >= 2045) = 1e-6; !! 2025 FRA:  0.000166255776391091
+
+    v47_prodSEtotal.up(t,regi,"pegas","segafos")  $ (t.val >= 2050) = 1e-6; !! 2025 FRA:  0.0266881468264974
+* v47_prodSEtotal.up(t,regi,"pegas","seh2")     $ (t.val >= 2050) = 1e-4; !! 2025 FRA:  0.000239442748872814
+    v47_prodSEtotal.up(t,regi,"pegas","seel")     $ (t.val >= 2050) = 2e-5; !! 2025 FRA:  0.0015778105071446
+    v47_prodSEtotal.up(t,regi,"pegas","sehe")     $ (t.val >= 2050) = 1e-6; !! 2025 FRA:  4.06310601513606E-8
+
+*** To this end, this strategy is broken down by sectors, and targets different milestones:
+*** - A target of 66% of new cars sales being electric by 2030.
+*** - A 25% increase in public transport use (bus, rail etc.) by 2030
+*** - The decarbonization of industry through an approach involving the 50 largest French industrial sites in France
+*** - An 85% reduction in oil-fired boilers in tertiary buildings, and a 60% reduction in the residential sector with
+***   the objective to phase out fossil oil for heating by 2035
+*** - In the energy sector, France is setting out its objectives to phase out fossil fuels and increase decarbonized production,
+***   including renewable energy, nuclear power hydrogen, biogas and alternative fuels
+$endif.cm_FRA_fossilPhaseout
+
+
+*** Nuclear capacity: nothing built between 1999 and 2024
+vm_deltaCap.fx(t,regi,"tnrs","1") $ (2000 < t.val and t.val < 2025) = 500 / 1e6; !! allow 500MW to compensate for depreciation
+vm_deltaCap.fx("2025",regi,"tnrs","1") = 1630 / 1e6; !! 1630MW plant FLAMANVILLE-3 started operating end of 2024
+
+*** Defining 2050 targets for nuclear capacity
+$ifthen.cm_FRA_GWnuc2050 not "%cm_FRA_GWnuc2050%" == "off"
+    vm_cap.fx("2050",regi,"tnrs","1") = %cm_FRA_GWnuc2050% / 1000; !! convert GW to TW
+    vm_capEarlyReti.up(t,regi,"tnrs") = 1e-3; !! no early retirement
+    
+    if(%cm_FRA_GWnuc2050% < 20,
+        vm_cap.up(t,regi,"tnrs","1") $ (t.val >= 2050) = %cm_FRA_GWnuc2050% / 1000; !! no renaissance
+        vm_capEarlyReti.up(t,regi,"tnrs") $ (t.val >= 2030) = 1; !! allow early retirement
+    elseif(%cm_FRA_GWnuc2050% > 70),
+        vm_cap.lo(t,regi,"tnrs","1") $ (t.val >= 2050) = %cm_FRA_GWnuc2050% / 1000; !! no later phase-out
+    );
+$endif.cm_FRA_GWnuc2050
+);
 
 *' @stop
 

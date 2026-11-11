@@ -325,7 +325,7 @@ display fm_dataglob;
 
 *** initialize regionalized data using global data
 pm_data(all_regi,char,te) = fm_dataglob(char,te);
-pm_data(regi,"lifetime","tnrs") $ sameas(regi, "FRA") = 60;
+*pm_data(regi,"lifetime","tnrs") $ sameas(regi, "FRA") = 60;
 
 *** -------------------------------------------------------------------------------
 *** Regional risk premium during building time

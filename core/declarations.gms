@@ -227,7 +227,7 @@ pm_capCumForeign(ttot,all_regi,all_te)               "Total cumulated capacity o
 pm_regiEarlyRetiRate(ttot,all_regi,all_te)           "regional early retirement rate, maximum allowed annual increase in the share of early retired capacity of a technology for which early retirement is allowed [1/year]"
 pm_extRegiEarlyRetiRate(ext_regi)                    "regional early retirement rate (extended regions) [1/year]" / %c_regi_earlyreti_rate% /
 $IFTHEN.tech_earlyreti not "%c_tech_earlyreti_rate%" == "off"
-p_techEarlyRetiRate(ext_regi,all_te)                 "Technology specific early retirement rate [1/year" / %c_tech_earlyreti_rate% /
+p_techEarlyRetiRate(ext_regi,all_te)                 "Technology specific early retirement rate [1/year]" / %c_tech_earlyreti_rate% /
 $ENDIF.tech_earlyreti
 
 *** adjustment cost parameters

@@ -529,11 +529,10 @@ parameter
   cm_emiscen        = 9;               !! def = 9  !!  regexp = 0|1|4|6|9|10
 *' *  (0): no global budget. Policy may still be prescribed by 41_emicaprei module.
 *' *  (1): BAU
-*' *  (4): emission time path
+*' *  (4): emission time path. WARNING: data for cm_emiscen 4 only exists for cm_multigasscen 2 bau scenarios and for cm_multigasscen 1
 *' *  (6): budget
 *' *  (9): tax scenario (requires running module 21_tax "on"), tax level controlled by module 45_carbonprice, other GHG etc. controlled by cm_rcp_scen
 *' *  (10): used for cost-benefit analysis
-*' *JeS* WARNING: data for cm_emiscen 4 only exists for cm_multigasscen 2 bau scenarios and for cm_multigasscen 1
 parameter
   cm_taxCO2_startyear    "level of co2 tax in start year in $ per t CO2eq"
 ;
@@ -1592,6 +1591,10 @@ $setGlobal cm_dispatchSeelDown  off   !! def = off  The amount that te producing
 $setGlobal cm_NucRegiPol   on   !! def = on
 *' *  cm_proNucRegiPol "enable European region specific pro nuclear capacitiy constraints"
 $setGlobal cm_proNucRegiPol   off   !! def = off
+*' *  cm_FRA_GWnuc2050 "nuclear capacity [GW] in FRA in 2050 (off lets the model decide, which means slowly phasing out as existing plants retire)"
+$setGlobal cm_FRA_GWnuc2050   off   !! def = off
+*' *  cm_FRAfossil "pledged fossil phase-out: coal 2030, oil 2045, gas 2050"
+$setGlobal cm_FRA_fossilPhaseout   off   !! def = off
 
 *' *  cm_CoalRegiPol "enable European region specific coal phase-out and new capacitiy constraints"
 $setGlobal cm_CoalRegiPol   on   !! def = on
