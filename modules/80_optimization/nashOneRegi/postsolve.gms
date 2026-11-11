@@ -30,64 +30,6 @@ loop(ttot$(ttot.val ge 2005),
       ); 
 ); 
 
-*' calculate both the size of the price change due to the price change anticipation effect in percent, as well as  
-*' the deviation of the yearly monetary export/import expenditure due to the price change anticipation effect: 
-loop(ttot$(ttot.val ge 2005),
-  loop(trade$(NOT tradeSe(trade)),
-    loop(regi,
-      p80_PriceChangePriceAnticipReg(ttot,trade,regi) = 100 *
-        ( sm_fadeoutPriceAnticip*p80_etaXp(trade)
-          * ( (pm_Xport0(ttot,regi,trade) - p80_Mport0(ttot,regi,trade)) - (vm_Xport.l(ttot,regi,trade) - vm_Mport.l(ttot,regi,trade))
-              - p80_taxrev0(ttot,regi)$(ttot.val gt 2005)$(sameas(trade,"good")) + vm_taxrev.l(ttot,regi)$(ttot.val gt 2005)$(sameas(trade,"good"))
-            )
-          / (p80_normalize0(ttot,regi,trade) + sm_eps)
-        )
-      ;
-
-      p80_DevPriceAnticipReg(ttot,trade,regi) = 
-        ( vm_Xport.l(ttot,regi,trade) - vm_Mport.l(ttot,regi,trade) ) 
-        * pm_pvp(ttot,trade) / pm_pvp(ttot,"good")
-        * p80_PriceChangePriceAnticipReg(ttot,trade,regi)
-      ;
-    );
-  p80_DevPriceAnticipGlob(ttot,trade) = sum(regi, abs( p80_DevPriceAnticipReg(ttot,trade,regi) ) );  
-  );
-p80_DevPriceAnticipGlobAll(ttot) = sum(trade$(NOT tradeSe(trade)), p80_DevPriceAnticipGlob(ttot,trade));
-);
-
-*' calculate maximum of p80_DevPriceAnticipGlob
-p80_DevPriceAnticipGlobMax(ttot,trade)$((ttot.val ge cm_startyear) AND (NOT tradeSe(trade))) = 
-  smax(ttot2$(ttot2.val ge cm_startyear AND ttot2.val le ttot.val), p80_DevPriceAnticipGlob(ttot2,trade) )
-;
-*' calculate maximum of p80_DevPriceAnticipGlobAll
-p80_DevPriceAnticipGlobAllMax(ttot)$((ttot.val ge cm_startyear)) = 
-  smax(ttot2$(ttot2.val ge cm_startyear AND ttot2.val le ttot.val), p80_DevPriceAnticipGlobAll(ttot2) )
-;
-
-p80_DevPriceAnticipGlobIter(ttot,trade,iteration)$((ttot.val ge cm_startyear) AND (NOT tradeSe(trade))) = p80_DevPriceAnticipGlob(ttot,trade);
-p80_DevPriceAnticipGlobMax2100Iter(trade,iteration)$(NOT tradeSe(trade)) = p80_DevPriceAnticipGlobMax("2100",trade);
-p80_DevPriceAnticipGlobAllMax2100Iter(iteration) = p80_DevPriceAnticipGlobAllMax("2100");
-
-
-*' For display of price change p80_PriceChangePriceAnticipReg, round to 0.1% 
-*o80_PriceChangePriceAnticipReg(ttot,trade,regi) = p80_PriceChangePriceAnticipReg(ttot,trade,regi);
-o80_PriceChangePriceAnticipReg(ttot,trade,regi) = round(p80_PriceChangePriceAnticipReg(ttot,trade,regi),1);
-
-*' determine largest price change in p80_PriceChangePriceAnticipReg
-o80_PriceChangePriceAnticipRegMaxIter("2100",iteration) = smax( (ttot,trade,regi)$(ttot.val le 2100) , abs(o80_PriceChangePriceAnticipReg(ttot,trade,regi) ) );
-o80_PriceChangePriceAnticipRegMaxIter("2150",iteration) = smax( (ttot,trade,regi)$(ttot.val ge 2110) , abs(o80_PriceChangePriceAnticipReg(ttot,trade,regi) ) );
-
-display  
-  p80_DevPriceAnticipGlob, 
-  p80_DevPriceAnticipGlobMax, 
-  p80_DevPriceAnticipGlobAllMax, 
-  p80_DevPriceAnticipGlobMax2100Iter,
-  p80_DevPriceAnticipGlobAllMax2100Iter,
-  p80_DevPriceAnticipGlobAll,  
-  o80_PriceChangePriceAnticipReg
-  o80_PriceChangePriceAnticipRegMaxIter
-; 
-
 *** nashOneRegi: unlike nash, world prices (pm_pvp) are taken from path_gdx and NEVER updated.
 *** Feed updated quantities into the next iteration, used for price-anticipation terms of 
 *** selected regions in q80_budg_intertemp
@@ -114,23 +56,7 @@ p80_surplusMaxRel(trade,iteration,ttot)$((ttot.val ge cm_startyear) AND (NOT tra
 p80_surplusMax2100(trade)$(NOT tradeSe(trade)) = p80_surplusMax_iter(trade,iteration,"2100");
 
 
-***convergence indicators 
-loop(trade$(NOT tradeSe(trade)),
-    p80_defic_trade(trade) = 1/pm_pvp("2005","good") *
-    sum(ttot$(ttot.val ge 2005),   pm_ts(ttot) * (
-        abs(p80_surplus(ttot,trade,iteration)) * pm_pvp(ttot,trade)
-        + sum(regi, abs(p80_taxrev0(ttot,regi)) * pm_pvp(ttot,"good"))$(sameas(trade,"good") and (ttot.val ge max(2010,cm_startyear)) )  
-        + sum(regi, abs(vm_costAdjNash.l(ttot,regi)) * pm_pvp(ttot,"good"))$(sameas(trade,"good") and (ttot.val ge 2005) )  
-
-    )
-    );
-);
-p80_defic_sum("1") = 1;
-p80_defic_sum(iteration) = sum(trade$(NOT tradeSe(trade)),  p80_defic_trade(trade)); 
-p80_defic_sum_rel(iteration) =  100 * p80_defic_sum(iteration) / (p80_normalizeLT("good")/pm_pvp("2005","good"));
-
-
-***adjust parameters for next iteration 
+***adjust parameters for next iteration
 ***Decide on when to fade out price anticipation terms (doing this too early leads to diverging markets)
 ***if markets are reasonably cleared
 if( (smax(tradePe,p80_surplusMax_iter(tradePe,iteration,'2150')) lt (10 * 0.05))   
@@ -154,14 +80,8 @@ pm_FEPrice_iter(iteration,t,regi,enty,sector,emiMkt) =
 
 ***Decide, on whether to end iterating now. if any of the following criteria (contained in the set convMessage80(surplus,infes,nonopt)) is not met, s80_bool is set to 0, and the convergence process is NOT stopped
 ***reset some indicators
-s80_bool=1;  
-p80_messageShow(convMessage80) = NO;   
-p80_messageFailedMarket(ttot,all_enty) = NO;
-
-*** criterion "surplus": NOT evaluated here. World prices/quantities are fixed from the reference
-*** gdx and are never adjusted in response to the studied region(s)' trade deviation,
-*** so a persistent residual surplus equal to that deviation is expected and must not block convergence.
-*** Diagnostics (p80_surplusMax_iter etc.) are still computed above/below for monitoring purposes only.
+s80_bool=1;
+p80_messageShow(convMessage80) = NO;
 
 *** critertion "infes": restricted to selected regions in regi_dyn80
 loop(regi_dyn80,
@@ -195,9 +115,6 @@ if(sm_fadeoutPriceAnticip gt cm_maxFadeOutPriceAnticip,
 ***  s80_bool = 0; !! not an active convergence criterion anymore 
   p80_messageShow("anticip") = YES;
 );
-
-*' criterion "Deviation due to price anticipation": NOT evaluated here, since it is only
-*' meaningful while prices are still being adjusted in response to the surplus (see above).
 
 *' criterion "Did REMIND run a minimum number of iterations?" nash requires at least 18 (to allow
 *' for at least 4 iterations with EDGE-T); nashOneRegi only needs a couple of iterations for the
@@ -374,7 +291,6 @@ display p80_repy;
 
 display "trade convergence indicators";
 display p80_surplusMaxTolerance, p80_surplusMax2100;
-display p80_defic_trade, p80_defic_sum,p80_defic_sum_rel;
 
 display "Reasons for non-convergence in this iteration (if not yet converged)";
 
@@ -383,14 +299,6 @@ display "Reasons for non-convergence in this iteration (if not yet converged)";
           display "#### 1.) Infeasibilities found in at least some regions in the last iteration. Please check parameter p80_repy for details. ";
 		      display "#### Try a different gdx, or re-run the optimization with cm_nash_mode set to debug in order to debug the infes.";
         );
-        if(sameas(convMessage80, "surplus"),
-	        display "#### 2.) Some markets failed to reach a residual surplus below the prescribed threshold. ";
-	        display "#### In the following, the offending markets are indicated by a 1:";
-	        OPTION decimals = 0;
-          display p80_messageFailedMarket;
-	        OPTION decimals = 3;
-          display "#### You will find detailed trade convergence indicators below, search for p80_defic_trade";
-        );	   
         if(sameas(convMessage80, "nonopt"),
     		  display "#### 3.) Found a feasible, but non-optimal solution. This is the infamous status-7 problem: ";
 		      display "#### We can't accept this solution, because it is non-optimal, and, in addition, too far away from the last known optimal solution. ";
@@ -398,10 +306,6 @@ display "Reasons for non-convergence in this iteration (if not yet converged)";
 	      );	 
 	      if(sameas(convMessage80, "taxconv"),
 		      display "#### 4.) Taxes did not converge in all regions and time steps. Absolute level of tax revenue must be smaller than 0.1 percent of GDP. Check p80_convNashTaxrev_iter below.";
-	      );
-        if(sameas(convMessage80, "DevPriceAnticip"),
-		      display "#### 5.) The total monetary value of the price anticipation term times the traded amount are larger than the goods imbalance threshold * 0.1";
-          display "#### Check out p80_DevPriceAnticipGlobAllMax2100Iter, which needs to be below 0.1 * the threshold for goods imbalance, p80_surplusMaxTolerance";
 	      );
         if(sameas(convMessage80, "anticip"),
 		      display "#### 5b.) only for checking, not anymore a criterion that stops convergence: The fadeout price anticipation terms are not sufficiently small.";
@@ -497,8 +401,6 @@ display "See the indicators below to dig deeper on the respective reasons of non
 display "tax convergence indicators";
 display p80_convNashTaxrev_iter;
 
-display "detailed trade convergence indicators";
-display p80_defic_trade, p80_defic_sum,p80_defic_sum_rel;
 OPTION decimals = 7;
 display p80_surplus;
 OPTION decimals = 3;
@@ -508,12 +410,6 @@ display pm_taxCO2eq_iter;
 
 display "Carbon tax difference to last iteration for global targets of 45_carbonprice/functionalForm/postsolve";
 display pm_taxCO2eq_anchor_iterationdiff;
-
-
-*RP* display effect of additional convergence push
-display "display effect of additional convergence push";
-display  o80_trackSurplusSign, o80_SurplusOverTolerance, o80_counter_iteration_trade_ttot, p80_etaST_correct_safecopy,p80_etaST_correct,p80_pvp_itr;
-
 
 
 ***end with failure message if max number of iterations is reached w/o convergence:
@@ -531,15 +427,6 @@ if( (s80_bool eq 0) and (iteration.val eq cm_iteration_max),     !! reached max 
 		 display "#### Try a different gdx, or re-run the optimization with cm_nash_mode set to debug in order to debug the infes.";
 		 display p80_repy;
 	     );	 
-	     if(sameas(convMessage80 , "surplus"),
-	       display "####";
-	       display "#### 2.) Some markets failed to reach a residual surplus below the prescribed threshold. ";
-	       display "#### You may try less stringent convergence target (a lower cm_nash_autoconverge), or a different gdx. ";
-	       display "#### In the following, the offending markets are indicated by a 1:";
-	       OPTION decimals = 0;
-               display p80_messageFailedMarket;
-	       OPTION decimals = 3;	       
-	      );
 	     if(sameas(convMessage80, "nonopt"),
 		 display "####";
 		 display "#### 3.) Found a feasible, but non-optimal solution. This is the infamous status-7 problem: ";
@@ -609,10 +496,6 @@ $ifthen.cm_implicitPePriceTarget not "%cm_implicitPePriceTarget%" == "off"
 	      );
 $endIf.cm_implicitPePriceTarget
 	 );
-	 display "#### Info: These residual market surplusses in current monetary values are:";
-	 display  p80_defic_trade;
-	 display "#### The sum of those, normalized to the total consumption, given in percent is: ";
-	 display  p80_defic_sum_rel;
 
      display "################################################################################################";
      display "################################################################################################";
@@ -644,12 +527,6 @@ if(s80_bool eq 1,
     display  p80_surplusMax2100;
     display "#### This meets the prescribed tolerance requirements of: ";
     display  p80_surplusMaxTolerance;
-    display "#### Info: These residual market surplusses in monetary are :";
-    display  p80_defic_trade;
-    display "#### Info: And the sum of those (equivalent to Negishi's defic_sum):";
-    display  p80_defic_sum;
-    display "#### This value in percent of the NPV of consumption is: ";
-    display  p80_defic_sum_rel;
     display "############";
     display "######################################################################################################";
     OPTION decimals = 3;

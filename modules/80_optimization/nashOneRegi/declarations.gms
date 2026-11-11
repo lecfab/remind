@@ -20,27 +20,12 @@ p80_etaAdj(all_enty)                        "Adjustment costs for changes of tra
 
 ***prices
 p80_pvp_itr(ttot,all_enty,iteration)        "Price on commodity markets per iteration",
-p80_pvpFallback(ttot,all_enty)              "Helper parameter. Price path from input/prices_NASH.inc. Only used if reading prices from gdx fails.",
 
-p80_normalizeLT(all_enty)                   "Aggregated intertemporal  market volume",
 p80_normalize0(ttot,all_regi,all_enty)      "Normalization parameter for market volume"
 
 ***parameter containing the respective level values from last iteration (the first set of values taken from gdx in the first iteration, respectively)
 p80_Mport0(tall,all_regi,all_enty)          "Imports in last iteration"
 p80_surplus(tall,all_enty,iteration)        "Surplus on commodity market",
-p80_defic_trade(all_enty)                   "Surplus in monetary terms over all times on commodity markets [trillion US$2017]",
-p80_defic_sum(iteration)                    "Surplus in monetary terms over all times on all commodity markets combined [trillion US$2017] (NOTE: to compare this number with the Negishi defic_sum, divide by around 100)",
-p80_defic_sum_rel(iteration)                "Surplus monetary value over all times on all commodity markets combined, normalized to consumption [%]",
-
-*LB* diagnostic parameters
-p80_etaLT_correct(all_enty,iteration)       "long term price correction factor in percent"
-p80_etaST_correct(tall,all_enty,iteration)  "short term price correction factor in percent"
-
-p80_etaST_correct_safecopy(tall,all_enty,iteration)       "auxiliary parameter to remember short term price correction factor in percent, before new convergence adjustments"
-o80_counter_iteration_trade_ttot(ttot,all_enty,iteration) "auxiliary parameter to display in which iteration and for which item (ttot, trade) additional convergence measures were taken"
-o80_trackSurplusSign(ttot,all_enty,iteration)             "auxiliary parameter to track how long the surplus for an item (ttot, trade) had the same sign over iterations"
-o80_SurplusOverTolerance(ttot,all_enty,iteration)         "auxiliary parameter to track in which iterations which item surpassed the tolerance (positive/negative)"
-
 
 p80_surplusMax_iter(all_enty,iteration,tall)    "Diagnostics for Nash: Worst residual market surplus until given year, absolute value. [TWa, trillion Dollar, GtC]"
 p80_surplusMax2100(all_enty)               "Worst residual market surplus until 2100, absolute value. [TWa, trillion Dollar, GtC]"
@@ -57,25 +42,12 @@ p80_repy_iteration(all_regi,solveinfo80,iteration) "summary report from solver i
 p80_repyLastOptim(all_regi,solveinfo80)    "p80_repy from last iteration"
 p80_repy_thisSolitr(all_regi,solveinfo80)    "p80_repy from the current solitr - only shows results for regions that were run in this solItr"
 p80_repy_nashitr_solitr(all_regi,solveinfo80,iteration,sol_itr)   "summary report from solver in nash iteration and solver iteration"
-p80_messageFailedMarket(tall,all_enty)     "nash display helper"
 p80_messageShow(convMessage80)             "nash display helper"
 p80_trackConsecFail(all_regi)              "Parameter to keep track of consecutive solve failures of regions in Nash mode."
 
 p80_curracc(ttot,all_regi)                 "current account"
 
 pm_cumEff(tall,all_regi,all_in)            "parameter for spillover externality (aggregated productivity level)"
-
-p80_PriceChangePriceAnticipReg(ttot,all_enty,all_regi)  "Price change of a trade good due to the price anticipation effect. [Percent]"
-o80_PriceChangePriceAnticipReg(ttot,all_enty,all_regi)  "only for display: Price change of a trade good due to price anticipation. If nothing is displayed, all values are <0.1%. [Percent, rounded to 0.1%]"
-o80_PriceChangePriceAnticipRegMaxIter(ttot,iteration)   "only for display: Largest absolute value of o80_PriceChangePriceAnticipReg until 2100/2150, tracked over iteration. [Percent, rounded to 0.1%]"
-p80_DevPriceAnticipReg(ttot,all_enty,all_regi)          "Deviation of the yearly monetary export/import expenditure due to price change anticipation effect. [trillion Dollar]"
-p80_DevPriceAnticipGlob(ttot,all_enty)                  "Global sum of p80_DevPriceAnticipReg. [trillion Dollar]"
-p80_DevPriceAnticipGlobIter(ttot,all_enty,iteration)    "Track p80_DevPriceAnticipGlob over iterations. [trillion Dollar]"
-p80_DevPriceAnticipGlobAll(ttot)                        "p80_DevPriceAnticipGlob summed over all trade goods. [trillion Dollar]"
-p80_DevPriceAnticipGlobMax(ttot,all_enty)               "Max of p80_DevPriceAnticipGlob until the given year. [trillion Dollar]"
-p80_DevPriceAnticipGlobAllMax(ttot)                     "Max of p80_DevPriceAnticipGlobAll until the given year. [trillion Dollar]"
-p80_DevPriceAnticipGlobMax2100Iter(all_enty,iteration)  "Track the 2100 value of p80_DevPriceAnticipGlobMax over iterations. [trillion Dollar]"
-p80_DevPriceAnticipGlobAllMax2100Iter(iteration)        "Track the 2100 value of p80_DevPriceAnticipGlobAllMax over iterations. [trillion Dollar]"
 
 *EMIOPT relevant
 p80_eoMargPermBudg(all_regi)               "marginal of permit budget restriction"
@@ -130,12 +102,5 @@ s80_bool                                   "helper"
 s80_converged                              "if nash converged, this is 1"
 s80_runInDebug                             "Is 1 if regions stayed infeasible in nash and start in debug mode automatically following the parallel mode" /0/
 ;
-
-*' defining specific output formats:
-option   p80_DevPriceAnticipGlobAll:3:0:1;
-option   p80_DevPriceAnticipGlobAllMax:3:0:1;
-option   o80_PriceChangePriceAnticipReg:1:2:1;
-option   o80_PriceChangePriceAnticipRegMaxIter:1:1:1;
-
 
 *** EOF ./modules/80_optimization/nashOneRegi/declarations.gms

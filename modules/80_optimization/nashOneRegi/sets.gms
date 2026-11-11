@@ -26,8 +26,10 @@ solvestat, modelstat, resusd, objval
 
 convMessage80   "contains all convergence criteria"
 /
-infes,surplus,nonopt,taxconv,anticip,globalbudget,peakbudgyr,peakbudget,regiBudget,regiTarget,NDC,implicitEnergyTarget,cm_implicitPriceTarget,cm_implicitPePriceTarget,damage,DevPriceAnticip, IterationNumber
+infes,nonopt,taxconv,anticip,globalbudget,peakbudgyr,peakbudget,regiBudget,regiTarget,NDC,implicitEnergyTarget,cm_implicitPriceTarget,cm_implicitPePriceTarget,damage,IterationNumber
 /
+*** world prices/quantities are fixed from the path_gdx and never updated in postsolve, so the trade-surplus and
+*** price-anticipation convergence criteria ("surplus", "anticip", "DevPriceAnticip") are not evaluated here.
 
 activeConvMessage80(convMessage80)   "all active convergence criterias" / /
 
@@ -42,9 +44,6 @@ teLearn(learnte_dyn80)   = YES;
 activeConvMessage80("infes") = YES;
 activeConvMessage80("nonopt") = YES;
 activeConvMessage80("IterationNumber") = YES;
-
-*** world prices/quantities are fixed from the path_gdx and never updated in postsolve, so the trade-surplus and
-*** price-anticipation convergence criteria ("surplus", "anticip", "DevPriceAnticip") are not evaluated here.
 
 if (cm_TaxConvCheck eq 1, activeConvMessage80("taxconv") = YES;);
 activeConvMessage80("globalbudget") = YES;
