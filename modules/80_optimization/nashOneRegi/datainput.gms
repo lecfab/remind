@@ -18,10 +18,10 @@ pm_co2eqForeign(t, regi) = (1 - pm_shPerm(t,regi)) * pm_emicapglob(t);
 ***convergence mode
 if(cm_nash_autoconverge gt 0,
 
-*LB*AJS* unlike nash, nashOneRegi only needs to calibrate the studied region(s)' own national
-*** targets against an otherwise fixed world, which typically takes a handful of iterations, not
-*** the ~100 nash needs for global market clearing. Override via cm_iteration_max in the
-*** scenario config if a specific study needs more/fewer.
+*** set max number of iterations
+*** unlike nash, nashOneRegi only needs to solve national targets of selected region(s)
+*** against an otherwise fixed world, which typically takes a handful of iterations.
+*** As with nash, you can change that with switches cm_nash_autoconverge=0 and cm_iteration_max.
 cm_iteration_max = 10;
 
  if(cm_nash_autoconverge eq 1,
@@ -79,7 +79,6 @@ s80_fadeoutPriceAnticipStartingPeriod = 0;
 sm_fadeoutPriceAnticip = 1;
 *AJS*technical stuff. We want GAMS to import values for the following variables/parameters from the gdx, it would not do that unless you set them a (any) value beforehand.
 pm_pvp(ttot,trade)$(ttot.val ge 2005) = NA;
-p80_pvpFallback(ttot,trade)$(ttot.val ge 2005) = NA;
 pm_Xport0(ttot,regi,trade)$(ttot.val ge 2005) = NA;
 p80_Mport0(ttot,regi,trade)$(ttot.val ge 2005) = NA;
 vm_Xport.l(ttot,regi,trade)$(ttot.val ge 2005) = NA;
@@ -97,10 +96,6 @@ p80_repy_nashitr_solitr(all_regi,solveinfo80,iteration,sol_itr) = 0;
 pm_capCumForeign(ttot,regi,teLearn)$(ttot.val ge 2005)=0;
 qm_co2eqCum.m(regi) = 0;
 q80_budgetPermRestr.m(regi) = 0;
-
-***read in price paths as fallback option
-***p80_pvpFallback(ttot,trade) = 0;
-$include "./modules/80_optimization/nashOneRegi/input/prices_NASH.inc";
 
 ***EMIOPT------------------------------------------------------------------------------
 if ( cm_emiscen eq 6,

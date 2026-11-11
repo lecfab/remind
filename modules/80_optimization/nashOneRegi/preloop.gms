@@ -17,29 +17,28 @@
 *** assign fake values for p80_repyLastOptim which gets initialised in the loop
 p80_repyLastOptim(regi,solveinfo80) = NA;
 
-*LB*AJS* regions outside regi_dyn80 are not re-solved: their trade/production variables stay at
-*** whatever was loaded from the reference gdx above, for the whole run. Mark them as already
-*** solved/optimal so solve.gms's diagnostics (pm_SolNonInfes) and postsolve's convergence checks
-*** never try to re-evaluate or block on them.
+*** Regions outside regi_dyn80 are not re-solved: trade/production variables stay at the gdx reference.
+*** Mark them as already solved/optimal so that diagnostics in solve.gms (pm_SolNonInfes) and postsolve
+*** convergence checks never try to re-evaluate or block on them.
 p80_repy(all_regi,"modelstat")$(NOT regi_dyn80(all_regi)) = 2;
 p80_repy(all_regi,"solvestat")$(NOT regi_dyn80(all_regi)) = 1;
 
 
 *AJS* initialize starting points for prices, trade volumes etc. from gdx.
 ***in order to read parameters like p80_priceXXX from a gdx, instead of only variables , we have to explicitly instruct gams to do so in the execute_loadpoint command in core/preloop.gms.
-***the price paths are the trickiest part. Try to find p80_priceXXX prices in the gdx fist, if that fails, fallback to price path read from input/prices_NASH.inc
+*LB*AJS* unlike nash, nashOneRegi has no cold-start case: path_gdx must be an already converged
+*** full-world nash run, so plausible trade prices must be present in it. Rather than silently
+*** falling back to a generic price path (which would no longer match that reference world),
+*** abort loudly so a wrong/non-converged path_gdx is caught immediately.
 loop(ttot$(ttot.val ge 2005),
     loop(trade$(NOT tradeSe(trade)),
         if((pm_pvp(ttot,trade) eq NA) OR (pm_pvp(ttot,trade) lt 1E-12) OR (pm_pvp(ttot,trade) gt 0.1) ,
-***in case we have not been able to read price paths from the gdx, or these price are zero (or eps),  fall back to price paths in file input/prices_NASH.inc:
-            pm_pvp(ttot,trade) = p80_pvpFallback(ttot,trade);
-            display 'Nash: Info: Could not load useful initial price from gdx, falling back to the one found in input/prices_NASH.inc. This should not be a problem, the runs can stil converge. ';
+            display "nashOneRegi: implausible or missing pm_pvp loaded from path_gdx for (ttot,trade):";
+            display ttot.tl, trade.tl, pm_pvp(ttot,trade);
+            execute_unload "abort.gdx";
+            abort "nashOneRegi requires plausible trade prices (pm_pvp) already present in path_gdx. Check that path_gdx points to an already converged full-world nash run.";
          );
-***in case pm_pvp is not found in gdx:
-        if(pm_pvp(ttot,trade) eq NA,
-        pm_pvp(ttot,trade) = 0;
-         );
-        loop(regi,	    
+        loop(regi,
          pm_Xport0(ttot,regi,trade)  = vm_Xport.l(ttot,regi,trade);
          p80_Mport0(ttot,regi,trade) = vm_Mport.l(ttot,regi,trade);
        

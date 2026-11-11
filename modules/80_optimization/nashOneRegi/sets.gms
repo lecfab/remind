@@ -31,26 +31,20 @@ infes,surplus,nonopt,taxconv,anticip,globalbudget,peakbudgyr,peakbudget,regiBudg
 
 activeConvMessage80(convMessage80)   "all active convergence criterias" / /
 
-*LB*AJS* regions re-optimized against an otherwise fixed (frozen) world, taken from the gdx
-regi_dyn80_list(all_regi) "regions to be re-optimized, read from c_testOneRegi_region" / %c_testOneRegi_region% /,
-regi_dyn80(all_regi)      "regions to be re-optimized against a fixed rest-of-world"
+*** Regions to optimise against an otherwise fixed world taken from path_gdx. GAMS parses
+*** c_testOneRegi_region as a comma-separated element list (e.g. "FRA" or "FRA, DEU"), so this
+*** single declaration both reads the switch and initializes the set - no further assignment needed.
+regi_dyn80(all_regi)      "regions to be re-optimized against a fixed rest-of-world" / %c_testOneRegi_region% /
 ;
 
 teLearn(learnte_dyn80)   = YES;
-
-regi_dyn80(all_regi) = NO;
-regi_dyn80(regi_dyn80_list) = YES;
 
 activeConvMessage80("infes") = YES;
 activeConvMessage80("nonopt") = YES;
 activeConvMessage80("IterationNumber") = YES;
 
-*** world prices/quantities are fixed from the reference gdx and never updated in postsolve,
-*** so the trade-surplus and price-anticipation convergence criteria (which only make sense
-*** while prices are still being adjusted) are not evaluated here.
-***activeConvMessage80("surplus") = YES;
-***activeConvMessage80("anticip") = YES;
-***activeConvMessage80("DevPriceAnticip") = YES;
+*** world prices/quantities are fixed from the path_gdx and never updated in postsolve, so the trade-surplus and
+*** price-anticipation convergence criteria ("surplus", "anticip", "DevPriceAnticip") are not evaluated here.
 
 if (cm_TaxConvCheck eq 1, activeConvMessage80("taxconv") = YES;);
 activeConvMessage80("globalbudget") = YES;

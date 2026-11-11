@@ -88,17 +88,9 @@ display
   o80_PriceChangePriceAnticipRegMaxIter
 ; 
 
-*LB*AJS* nashOneRegi: unlike nash, world prices (pm_pvp) are taken from the reference gdx and are
-*** NEVER updated here from the trade surplus. Nash's surplus-feedback price-adjustment machinery
-*** (p80_etaLT_correct/p80_etaST_correct/p80_pvp_itr and the "stronger push" escalation) is
-*** therefore dropped entirely: letting France's small trade deviation nudge world prices while
-*** the rest of the world never re-optimizes in response would be inconsistent, not a meaningful
-*** partial Nash iteration. A small residual trade surplus equal to the studied region(s)'
-*** deviation from the reference is expected and accepted (see the "small region" assumption).
-
-*AJS* feed updated quantities into the next iteration (used by the studied region(s)' own
-*** price-anticipation term in q80_budg_intertemp); frozen regions' vm_Xport.l/vm_Mport.l never
-*** change, so this is a no-op for them.
+*** nashOneRegi: unlike nash, world prices (pm_pvp) are taken from path_gdx and NEVER updated.
+*** Feed updated quantities into the next iteration, used for price-anticipation terms of 
+*** selected regions in q80_budg_intertemp
 *ML* adjustments in case of infeasibilities (increase import)
 loop(trade$(NOT tradeSe(trade)),
     loop(regi,
@@ -166,15 +158,12 @@ s80_bool=1;
 p80_messageShow(convMessage80) = NO;   
 p80_messageFailedMarket(ttot,all_enty) = NO;
 
-***criterion "surplus": NOT evaluated here. World prices/quantities are fixed from the reference
-*** gdx and are never adjusted in response to the studied region(s)' trade deviation (see
-*** postsolve's price-update section above), so a persistent residual surplus equal to that
-*** deviation is expected and must not block convergence. Diagnostics (p80_surplusMax_iter etc.)
-*** are still computed above/below for monitoring purposes only.
+*** criterion "surplus": NOT evaluated here. World prices/quantities are fixed from the reference
+*** gdx and are never adjusted in response to the studied region(s)' trade deviation,
+*** so a persistent residual surplus equal to that deviation is expected and must not block convergence.
+*** Diagnostics (p80_surplusMax_iter etc.) are still computed above/below for monitoring purposes only.
 
-*** critertion "infes": is any (re-solved) region neither optimal nor intermediate non-optimal -> infeasible.
-*** Restricted to regi_dyn80: frozen regions were marked modelstat=2 in preloop and are never
-*** re-solved, so they trivially always pass and don't need (re-)checking here.
+*** critertion "infes": restricted to selected regions in regi_dyn80
 loop(regi_dyn80,
   if( (p80_repy(regi_dyn80,'modelstat') ne 2) and (p80_repy(regi_dyn80,'modelstat') ne 7),    !! 2 is optimal, 7 nonopt,
     s80_bool = 0;
@@ -213,15 +202,13 @@ if(sm_fadeoutPriceAnticip gt cm_maxFadeOutPriceAnticip,
 *' criterion "Did REMIND run a minimum number of iterations?" nash requires at least 18 (to allow
 *' for at least 4 iterations with EDGE-T); nashOneRegi only needs a couple of iterations for the
 *' studied region(s)' own national-target calibration (tax conv., NDC, regional budget, ...), so
-*' the floor is much lower. Raise this if a coupled module (e.g. EDGE-T) needs more iterations.
+*' the floor is much lower.
 if( (iteration.val le 1),
   s80_bool=0;
   p80_messageShow("IterationNumber") = YES;
 );
 
-***additional criterion: did taxes converge? (only checked if cm_TaxConvCheck is 1)
-*** restricted to regi_dyn80: frozen regions' tax revenue never changes from the (already
-*** converged) reference, so re-checking them is unnecessary.
+***additional criterion: did taxes converge? (only checked if cm_TaxConvCheck is 1, restricted to regi_dyn80)
 p80_convNashTaxrev_iter(iteration,t,regi_dyn80) = 0;
 loop(regi_dyn80,
     loop(t,
@@ -236,10 +223,9 @@ loop(regi_dyn80,
 );
 
 *** additional criterion: Were regional climate targets reached?
-*** restricted to ext_regi groups contained in regi_dyn80. CAVEAT: if an emiMkt/group target
-*** spans the studied region(s) plus other (frozen) regions, it cannot be validly re-checked by
-*** varying only regi_dyn80 - such group targets should be disabled for this realization, or
-*** verified not to include a studied region together with a frozen one.
+*** Restricted to ext_regi groups contained in regi_dyn80. CAVEAT: if an emiMkt/group target
+*** spans a selected region plus other regions, it cannot be validly re-checked by varying only regi_dyn80
+*** Disable the target or ensure it applies only on optimised regions or only on fixed regions
 $ifthen.emiMkt not "%cm_emiMktTarget%" == "off"
 loop((ttot,ttot2,ext_regi,emiMktExt)$(pm_emiMktTarget_dev(ttot,ttot2,ext_regi,emiMktExt) AND regi_dyn80(ext_regi)),
   if(NOT(pm_allTargetsConverged(ext_regi) eq 1),
@@ -342,8 +328,7 @@ $endIf.carbonprice
 
 $ifthen.carbonpriceRegi %carbonprice% == "functionalFormRegi"
 *** check regional budget target, must be within tolerance level of target value.
-*** restricted to regi_dyn80: frozen regions' carbon tax/budget are unchanged from the
-*** (already converged) reference, so re-checking them is unnecessary.
+*** restricted to regi_dyn80.
   p80_regionalBudget_absDev_iter(iteration,regi_dyn80) = pm_budgetDeviation(regi_dyn80);
   loop(regi_dyn80,
   !! If the deviation is positive, i.e. budget is too high and requires an increase in Carbon Price => always throw an error

@@ -14,11 +14,9 @@ if(cm_nash_mode eq 1,
   hybrid.solvelink = 0;  !! activate single-CPU mode for GAMS
 );
 
-*LB*AJS* only the region(s) under study (regi_dyn80) are ever solved; every other region keeps the
-*** values loaded from the reference (fixed-world) gdx for the whole run, see preloop.gms.
+*** Only solve selected regions (regi_dyn80). Other region keep the values loaded from path_gdx, see preloop.gms.
 loop (regi_dyn80,
-  !! only solve for regions that do not have a valid solution from the
-  !! last solver iteration
+  !! only solve for regions that do not have a valid solution from the last solver iteration
   if (    (   sol_itr.val gt 1
            OR s80_runInDebug eq 1)
       AND (   p80_repy(regi_dyn80,"modelstat") eq 2

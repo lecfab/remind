@@ -7,22 +7,20 @@
 *** SOF ./modules/80_optimization/nashOneRegi/realization.gms
 
 *' @description
-*' Like nash mode, each studied region (c_testOneRegi_region, set regi_dyn80) forms its own
-*' optimization problem and trades on goods and resource markets. Unlike nash mode, every other
-*' region is NOT re-optimized: its trade, production and tax variables are taken from, and stay
+*' Like nash mode, each selected region (c_testOneRegi_region, set regi_dyn80) forms its own
+*' optimisation problem and trades on goods and resource markets. Unlike nash mode, other regions
+*' are NOT re-optimized: their trade, production and tax variables are taken from, and stay
 *' fixed at, the values found in the reference gdx (input.gdx) - which must be an already
-*' converged full-world nash run. World prices (pm_pvp) and the global carbon-price anchor are
+*' converged global nash run. World prices (pm_pvp) and the global carbon-price anchor are
 *' likewise taken from that reference and never updated.
 *'
-*' This is intended for studies where the studied region(s) are assumed too small to move global
+*' This is intended for studies where the selected region(s) are assumed too small to move global
 *' prices or the global carbon budget: many scenario variants can then be produced by only
-*' re-solving the studied region(s) against one shared, already-converged world, needing just a
-*' few iterations (for the studied region(s)' own national-target calibration: tax convergence,
-*' NDC/regional budget targets, implicit price/quantity targets) instead of the tens of
-*' iterations a full nash run needs for global market clearing.
+*' solving the selected region(s) against one shared, already-converged world, needing just a
+*' few iterations for the targets to be met: tax convergence, NDC/regional budget, implicit targets...
 *'
-*' @limitations The "small region" assumption is not checked: if the studied region(s) are in fact
-*' large enough to move world prices or the global carbon budget noticeably, this realization will
+*' @limitations The "small region" assumption is not checked: if the selected region(s) are in fact
+*' large enough to move world prices or the global carbon budget noticeably, this realisation will
 *' silently ignore that feedback. Emission-market or quantity-target groups spanning a studied
 *' region together with a frozen region cannot be validly re-checked for convergence here.
 
