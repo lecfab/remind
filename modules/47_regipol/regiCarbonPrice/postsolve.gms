@@ -718,7 +718,12 @@ loop((ttot,ext_regi,taxType,targetType,qttyTarget,qttyTargetGroup)$pm_implicitQt
 
 loop((ttot,ext_regi,taxType,targetType,qttyTarget,qttyTargetGroup)$pm_implicitQttyTarget(ttot,ext_regi,taxType,targetType,qttyTarget,qttyTargetGroup),
   if(p47_implicitQttyTargetActive_iter(iteration,ext_regi) = 1,
-    loop(all_regi$regi_groupExt(ext_regi,all_regi),
+*** The tax is shared across every region in ext_regi's group (e.g. a GLO-wide biomass cap).
+*** Under nashOneRegi, only recompute it if that group is itself a selected region (regi_dyn80);
+*** otherwise the group also covers frozen regions, so keep the tax fixed at its path_gdx value.
+    loop(all_regi $ (regi_groupExt(ext_regi,all_regi)
+$if "%optimization%" == "nashOneRegi"                 and regi_dyn80(ext_regi)
+                    ),
 ***   terminal year onward tax
       if(sameas(taxType,"tax"),
         if((p47_implicitQttyTargetTax_prevIter(ttot,all_regi,qttyTarget,qttyTargetGroup) * p47_implicitQttyTargetTaxRescale(ttot,ext_regi,qttyTarget,qttyTargetGroup) lt 1e-10), !! assuring that the updated tax is positive, i.e. the target is achieved without the need for any additional tax

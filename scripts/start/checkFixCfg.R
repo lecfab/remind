@@ -89,8 +89,8 @@ checkFixCfg <- function(cfg, remindPath = ".", testmode = FALSE) {
   }
 
   # Check for compatibility with subsidizeLearning
-  if ((cfg$gms$optimization != "nash") && (cfg$gms$subsidizeLearning == "globallyOptimal") ) {
-    message("Only optimization='nash' is compatible with subsidizeLearning='globallyOptimal'. Switching subsidizeLearning to 'off' now.")
+  if (!cfg$gms$optimization %in% c("nash", "nashOneRegi") && cfg$gms$subsidizeLearning == "globallyOptimal") {
+    message("Only optimization='nash' or 'nashOneRegi' is compatible with subsidizeLearning='globallyOptimal'. Switching subsidizeLearning to 'off' now.")
     cfg$gms$subsidizeLearning <- "off"
   }
 
