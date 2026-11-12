@@ -196,20 +196,18 @@ vm_deltaCap.fx(t,regi,te,rlf) $ (t.val <= 2025 and pm_data(regi,"tech_stat",te) 
 *' ##### Capacity for nuclear energy
 *** TODO: data update ------------------------------------------------
 
-loop(t,
-  if( ( t.val > 2010 ) AND ( t.val < 2030 ) AND ( cm_startyear <= t.val ),
+loop(t $ (t.val > 2010 and t.val < 2030),
 *' The spin-up capacity from initialcap2 may be larger than historic capacities. For all regions but DEU, we don't want to enforce early retirement, so we calculate the standing capacities 
 *' resulting from 2005 capacities and normal technical depreciation. For DEU, the explicit nuclear phaseout means that capacities are phased down faster than the normal techincal lifetime
-    p_CapFixFromRWfix(t,regi,"tnrs") $ (NOT sameas(regi,"DEU") ) = max( pm_aux_capLowerLimit("tnrs",regi,t) , pm_NuclearConstraint(t,regi,"tnrs") );
-    p_CapFixFromRWfix(t,regi,"tnrs") $ (sameas(regi,"DEU")) = pm_NuclearConstraint(t,regi,"tnrs") ;  
-    p_deltaCapFromRWfix(t,regi,"tnrs") = ( p_CapFixFromRWfix(t,regi,"tnrs") - pm_aux_capLowerLimit("tnrs",regi,t) )
-                                    / 7.5;  !! this parameter is currently only for display and not further used to fix anything
+  p_CapFixFromRWfix(t,regi,"tnrs") $ (NOT sameas(regi,"DEU") ) = max( pm_aux_capLowerLimit("tnrs",regi,t) , pm_NuclearConstraint(t,regi,"tnrs") );
+  p_CapFixFromRWfix(t,regi,"tnrs") $ (sameas(regi,"DEU")) = pm_NuclearConstraint(t,regi,"tnrs") ;  
+  p_deltaCapFromRWfix(t,regi,"tnrs") = ( p_CapFixFromRWfix(t,regi,"tnrs") - pm_aux_capLowerLimit("tnrs",regi,t) )
+                                  / 7.5;  !! this parameter is currently only for display and not further used to fix anything
 *** keep nuclear power capacity in +-10% range of historic data, choose range to allow for some flexibility for the model
-    vm_cap.lo(t,regi,"tnrs","1") = 0.9 * p_CapFixFromRWfix(t,regi,"tnrs");
-    vm_cap.up(t,regi,"tnrs","1") = 1.1 * p_CapFixFromRWfix(t,regi,"tnrs");
+  vm_cap.lo(t,regi,"tnrs","1") = 0.9 * p_CapFixFromRWfix(t,regi,"tnrs");
+  vm_cap.up(t,regi,"tnrs","1") = 1.1 * p_CapFixFromRWfix(t,regi,"tnrs");
 *** More precision for FRA where data is up to date
-    vm_cap.lo(t,regi,"tnrs","1") $ (sameas(regi,"FRA")) = 0.98 * p_CapFixFromRWfix(t,regi,"tnrs");
-  );
+  vm_cap.lo(t,regi,"tnrs","1") $ (sameas(regi,"FRA")) = 0.98 * p_CapFixFromRWfix(t,regi,"tnrs");
 );
 
 if(cm_startyear <= 2030, !! require the realization of at least 50% of the max additions until 2030 (estimated at 80% of plants currently under construction) 
