@@ -477,6 +477,11 @@ v_shfe.lo(t,regi,entyFe,sector) $ pm_shfe_lo(t,regi,entyFe,sector) = pm_shfe_lo(
 *' upper and lower bounds on gases+liquids share in FE
 v_shGasLiq_fe.up(t,regi,sector) $ pm_shGasLiq_fe_up(t,regi,sector) = pm_shGasLiq_fe_up(t,regi,sector);
 v_shGasLiq_fe.lo(t,regi,sector) $ pm_shGasLiq_fe_lo(t,regi,sector) = pm_shGasLiq_fe_lo(t,regi,sector);
+*' bound v_shSeFeSector to its physical [0,1] share range: its defining equation q_shSeFeSector
+*' degenerates to 0=0 when the sector's FE demand for that carrier is exactly zero, leaving the
+*' variable otherwise free to drift to an arbitrary value and destabilize q_penSeFeSectorShareDev
+v_shSeFeSector.lo(t,regi,entySe,entyFe,sector,emiMkt) = 0;
+v_shSeFeSector.up(t,regi,entySe,entyFe,sector,emiMkt) = 1;
 
 *' Set H2 upper bound in buildings for years defined at cm_H2InBuildOnlyAfter
 vm_demFeSector.up(t,regi,"seh2","feh2s","build",emiMkt) $ (t.val <= cm_H2InBuildOnlyAfter) = 1e-6;

@@ -338,7 +338,7 @@ $endif.cm_FRA_fossilPhaseout
 *** Nuclear capacity: nothing built between 1999 and 2024
 vm_deltaCap.fx(t,regi,"tnrs","1") $ (2000 < t.val and t.val < 2025) = 500 / 1e6; !! allow 500MW to compensate for depreciation
 vm_deltaCap.fx("2025",regi,"tnrs","1") = (1630 + 500) / 1e6; !! 1630MW plant FLAMANVILLE-3 started operating end of 2024
-vm_deltaCap.up("2030",regi,"tnrs","1") = 2000 / 1e6; !! allow 2GW to compensate for depreciation
+vm_deltaCap.up("2030",regi,"tnrs","1") = 3000 / 1e6; !! allow 3GW to compensate for depreciation
 *** Nuclear capacity: 90% of 2025 capacity is kept until 2030 (forces depreciation to be compensated)
 vm_cap.lo("2030",regi,"tnrs","1") = 0.9 * pm_NuclearConstraint("2025",regi,"tnrs");
 
