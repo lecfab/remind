@@ -210,37 +210,9 @@ loop((t,regi_dyn80,entyPe)$pm_implicitPePriceTarget(t,regi_dyn80,entyPe),
 $endIf.cm_implicitPePriceTarget
 
 $ifthen.carbonprice %carbonprice% == "functionalForm"
-*** check global budget target from 45_carbonprice/functionalForm/postsolve
-*** convergence criterion defined via cm_budgetCO2_absDevTol [default = 2 Gt CO2]
-*** positive values of sm_globalBudget_absDev mean that target budget is exceeded (sm_globalBudget_absDev = s45_actualbudgetco2 - cm_budgetCO2from2020)
-*** if damages are not internalized, check positive and negative deviation from target budget
-*** if damages are internalized, only check positive deviation from target budget
+*** nashOneRegi: only selected regions are optimised, so the GLOBAL cumulated budget is considered almost unchanged
+*** There is thus no globalBudget convergence check
 p80_globalBudget_absDev_iter(iteration) = sm_globalBudget_absDev;
-$ifthen.globalBudget "%internalizeDamages%" == "off"
-  if (abs(p80_globalBudget_absDev_iter(iteration)) gt cm_budgetCO2_absDevTol,
-    s80_bool = 0;
-    p80_messageShow("globalbudget") = YES;
-  );
-$else.globalBudget
-  if (p80_globalBudget_absDev_iter(iteration) gt cm_budgetCO2_absDevTol,
-    s80_bool = 0;
-    p80_messageShow("globalbudget") = YES;
-  );
-$endIf.globalBudget
-
-*** check whether cm_peakBudgYr corresponds to year of maximum cumulative CO2 emissions
-*if (  (     cm_iterative_target_adj eq 9
-*        AND cm_peakBudgYr ne sm_peakBudgYr_check  ),
-*  s80_bool = 0;
-*  p80_messageShow("peakbudgyr") = YES;
-*);
-
-*** Check whether difference in cumulative emissions between both time steps is greater than sm_peakbudget_diff_tolerance
-if (  (   cm_iterative_target_adj eq 9
-      AND abs(sm_peakbudget_diff) gt sm_peakbudget_diff_tolerance),
-  s80_bool = 0;
-  p80_messageShow("peakbudget") = YES;
-);
 $endIf.carbonprice
 
 $ifthen.carbonpriceRegi %carbonprice% == "functionalFormRegi"
@@ -416,7 +388,7 @@ display pm_taxCO2eq_anchor_iterationdiff;
 if( (s80_bool eq 0) and (iteration.val eq cm_iteration_max),     !! reached max number of iteration, still no convergence
      OPTION decimals = 3;
      display "################################################################################################";
-     display "####################################  Nash Solution Report  ####################################";
+     display "################################  Nash OneRegi Solution Report  ################################";
      display "################################################################################################";
      display "####  !! Nash did NOT converge within the maximum number of iterations allowed !!"
 	 display "#### The reasons for failing to successfully converge are:"
