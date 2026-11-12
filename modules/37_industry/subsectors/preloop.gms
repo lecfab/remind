@@ -15,8 +15,14 @@ pm_NonFos_IndCC_fraction0(ttot,all_regi,emiInd37) = 0;
 *' of feedstocks
 p37_FeedstockCarbonContent(ttot,regi,entyFe)
   = sum(se2fe(entySeFos,entyFe,te),
-      pm_emifac(ttot,regi,entySeFos,entyFe,te,"co2") 
+      pm_emifac(ttot,regi,entySeFos,entyFe,te,"co2")
     - pm_emifacNonEnergy(ttot,regi,entySeFos,entyFe,"indst","co2")
     );
+
+*** nashOneRegi needs a default value for these variables from path_gdx otherwise regions
+*** that are not solved default to NA and break reportEmi.R (Emi|CO2|Energy|Demand|Industry|Waste)
+*** In optimised regions, values are overwritten by equations q37_incinerationEmi and q37_incinerationCCS
+Execute_Loadpoint 'input' v37_incinerationEmi.l = v37_incinerationEmi.l;
+Execute_Loadpoint 'input' vm_incinerationCCS.l  = vm_incinerationCCS.l;
 
 *** EOF ./modules/37_industry/subsectors/preloop.gms
