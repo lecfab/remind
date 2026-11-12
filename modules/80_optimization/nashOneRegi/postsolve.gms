@@ -534,10 +534,10 @@ if(s80_bool eq 1,
   );
 );
 
-*** check if any region has failed to solve consecutively for
+*** check if any of the selected regions has failed to solve consecutively for
 *** cm_abortOnConsecFail times
 if (cm_abortOnConsecFail gt 0,
-  loop (regi,
+  loop (regi_dyn80(regi),
     if (   (    p80_repy_iteration(regi,"solvestat",iteration) eq 1
             AND p80_repy_iteration(regi,"modelstat",iteration) eq 2)
         OR (    p80_repy_iteration(regi,"solvestat",iteration) eq 4
@@ -550,9 +550,9 @@ if (cm_abortOnConsecFail gt 0,
     );
   );
 
-  if (smax(regi, p80_trackConsecFail(regi)) >= cm_abortOnConsecFail,
+  if (smax(regi_dyn80(regi), p80_trackConsecFail(regi)) >= cm_abortOnConsecFail,
     if ((s80_runInDebug eq 0) AND (cm_nash_mode ne 1), !! auto-start debug only if not already in debug mode
-      if (sum(regi, pm_SolNonInfes(regi) ne 0) eq 0, !! if all regions are infeasible debug makes no sense
+      if (sum(regi_dyn80(regi), pm_SolNonInfes(regi) ne 0) eq 0, !! if all regions are infeasible debug makes no sense
         execute_unload "abort.gdx";
         abort "Run was aborted because the maximum number of consecutive failures was reached in at least one region! No debug started since all regions are infeasible.";
       else !! start debug mode only if at leat one region was feasible
