@@ -21,8 +21,11 @@ p37_FeedstockCarbonContent(ttot,regi,entyFe)
 
 *** nashOneRegi needs a default value for these variables from path_gdx otherwise regions
 *** that are not solved default to NA and break reportEmi.R (Emi|CO2|Energy|Demand|Industry|Waste)
-*** In optimised regions, values are overwritten by equations q37_incinerationEmi and q37_incinerationCCS
-Execute_Loadpoint 'input' v37_incinerationEmi.l = v37_incinerationEmi.l;
-Execute_Loadpoint 'input' vm_incinerationCCS.l  = vm_incinerationCCS.l;
+*** In optimised regions, values are overwritten by various q37_ equations
+Execute_Loadpoint 'input' v37_incinerationEmi.l     = v37_incinerationEmi.l;
+Execute_Loadpoint 'input' vm_incinerationCCS.l      = vm_incinerationCCS.l;
+Execute_Loadpoint 'input' v37_plasticsCarbon.l      = v37_plasticsCarbon.l;
+Execute_Loadpoint 'input' v37_plasticWaste.l        = v37_plasticWaste.l;
+Execute_Loadpoint 'input' v37_incineratedPlastics.l = v37_incineratedPlastics.l;
 
 *** EOF ./modules/37_industry/subsectors/preloop.gms
